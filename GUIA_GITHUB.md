@@ -1,45 +1,31 @@
 # Guía: GitHub para el equipo (Ismael, Alexandra, Israel, Diego)
 
-## 1. Crear el repositorio (Ismael, una sola vez)
+## Estado actual
 
-1. En [github.com](https://github.com) → **New repository**.
-2. Nombre: `proyecto-soap-productos`. Visibilidad: **Private** (recomendado
-   mientras es tarea de curso; lo pueden poner público después de calificar
-   si quieren mostrarlo en su portafolio).
-3. **No** marques "Initialize with README" (ya tenemos uno local).
-4. Copia la URL que te da GitHub (`git@github.com:usuario/proyecto-soap-productos.git`
-   o la versión `https://`).
+Ya está hecho (Ismael):
 
-Desde la carpeta del proyecto:
+- Repo creado: `https://github.com/melperso21-2025/proyecto-soap-productos`
+- Rama `main` (estable, solo para entregas) y rama `dev` (trabajo del equipo)
+  ya están en GitHub.
+- Las 5 ramas de trabajo ya están creadas y subidas, una por responsabilidad:
+  `feature/servidor`, `feature/validaciones`, `feature/cliente-python`,
+  `feature/cliente-php`, `feature/informe`.
 
-```bash
-git init
-git add .
-git commit -m "chore: estructura inicial del proyecto SOAP productos"
-git branch -M main
-git remote add origin <URL_DEL_REPO>
-git push -u origin main
-```
+Lo que falta: invitar a los 3 compañeros (sección 1) y que cada uno se pare
+sobre **su** rama `feature/*` (sección 3).
 
-Luego crea la rama `desarrollo`, que es donde va a trabajar todo el equipo
-día a día (ver sección 3):
-
-```bash
-git checkout -b desarrollo
-git push -u origin desarrollo
-```
-
-## 2. Invitar a los 3 compañeros
+## 1. Invitar a los 3 compañeros (Ismael, una sola vez)
 
 1. En el repo → **Settings** → **Collaborators** → **Add people**.
 2. Busca por su usuario o correo de GitHub: Alexandra, Israel, Diego.
 3. Rol: **Write** (pueden hacer push y abrir PRs, no pueden borrar el repo ni
    cambiar configuración crítica).
-4. Cada compañero acepta la invitación (le llega notificación/correo) y luego
-   clona el repo:
+4. Cada compañero acepta la invitación (le llega notificación/correo).
+
+## 2. Clonar el repo (cada compañero, una sola vez)
 
 ```bash
-git clone <URL_DEL_REPO>
+git clone https://github.com/melperso21-2025/proyecto-soap-productos.git
 cd proyecto-soap-productos
 ```
 
@@ -47,50 +33,74 @@ cd proyecto-soap-productos
 
 Tres niveles, de más estable a más experimental:
 
-- **`main`** — solo recibe código ya integrado y probado desde `desarrollo`.
-  Nadie hace `push` directo aquí; representa el estado que se entrega. Se
-  actualiza en puntos de control (ej. fin del día 3 y antes de la entrega
-  final), nunca a cada rato.
-- **`desarrollo`** — rama de trabajo compartida del equipo. Todo el mundo
-  arranca y termina su día aquí. Es donde se juntan las 4 partes antes de
-  pasar a `main`.
+- **`main`** — solo recibe código ya integrado y probado desde `dev`. Nadie
+  hace `push` directo aquí; representa el estado que se entrega. Se actualiza
+  en puntos de control (ej. fin del día 3 y antes de la entrega final), nunca
+  a cada rato.
+- **`dev`** — rama de trabajo compartida del equipo. Todo el mundo arranca y
+  termina su día aquí. Es donde se juntan las 4 partes antes de pasar a
+  `main`.
 - **`feature/*`** — una rama corta por responsabilidad, siguiendo el plan de
-  trabajo del Excel, que sale de `desarrollo` y vuelve a `desarrollo`:
-  - `feature/servidor` (Ismael) — server.js, validaciones, WSDL.
+  trabajo del Excel, que sale de `dev` y vuelve a `dev`. Ya están creadas en
+  GitHub, cada quien trabaja en la suya:
+  - `feature/servidor` (Ismael) — server.js, WSDL, arranque del servidor.
+  - `feature/validaciones` (Alexandra) — validaciones.js, mensajes de
+    error estándar, pruebas de WSDL en SoapUI.
   - `feature/cliente-python` (Israel) — cliente-python/.
   - `feature/cliente-php` (Diego) — cliente-php/.
   - `feature/informe` (Israel + Diego, luego Ismael consolida) — informe/.
 
 ```
-feature/servidor ──┐
-feature/cliente-python ─┼──▶ desarrollo ──▶ main
-feature/cliente-php ─┘         (integración)   (entrega)
+feature/servidor ───────┐
+feature/validaciones ───┤
+feature/cliente-python ─┼──▶ dev ──▶ main
+feature/cliente-php ────┘   (integración)   (entrega)
 ```
 
-Flujo diario (cada integrante, sobre su propia parte):
+> `feature/servidor` y `feature/validaciones` tocan archivos dentro de la
+> misma carpeta `servidor/` (Ismael y Alexandra ya trabajaban juntos en el
+> Excel en el WSDL y los casos de error). Es normal que sus Pull Requests se
+> crucen — por eso el PR de quien mergea segundo debe revisar con cuidado que
+> no se pise el trabajo del otro, y por eso ambos avisan en el equipo cuando
+> van a mergear a `dev`.
+
+### Cómo se sube cada compañero a su rama (primera vez)
+
+Como las ramas ya existen en GitHub, no se crean de nuevo — solo se "bajan"
+localmente con `checkout`. Por ejemplo, Israel con la suya:
 
 ```bash
-git checkout desarrollo
-git pull origin desarrollo
-git checkout -b feature/mi-parte      # solo la primera vez
-# ... trabajas y guardas cambios ...
-git add servidor/server.js
-git commit -m "feat: implementa ActualizarStock y CalcularValorInventario"
-git push -u origin feature/mi-parte
+git fetch origin
+git checkout feature/cliente-python
 ```
 
-Luego cada quien abre un **Pull Request hacia `desarrollo`** (no hacia
-`main`) en GitHub. Esto calza con la tarea #17 del plan ("Revisión cruzada de
-código"): antes de aprobar el PR, otro integrante del equipo lo revisa y
-comenta.
+Git reconoce que `origin/feature/cliente-python` ya existe y conecta tu rama
+local con ella automáticamente. Diego haría lo mismo con
+`feature/cliente-php`, Alexandra con `feature/validaciones`, y así cada quien.
 
-Cuando `desarrollo` esté estable y probado (las 6 operaciones funcionando con
-los 2 clientes), Ismael abre el PR final de `desarrollo` → `main`:
+### Flujo diario (una vez ya estás en tu rama)
+
+```bash
+git checkout feature/mi-parte
+git pull origin dev            # trae lo último que ya se integró en dev
+# ... trabajas y guardas cambios ...
+git add cliente-python/client.py
+git commit -m "feat: agrega consulta y listado de productos"
+git push origin feature/mi-parte
+```
+
+Cuando tu parte esté lista (o al final del día), abres un **Pull Request en
+GitHub de tu `feature/*` hacia `dev`** (no hacia `main`). Esto calza con la
+tarea #17 del plan ("Revisión cruzada de código"): antes de aprobar el PR,
+otro integrante del equipo lo revisa y comenta.
+
+Cuando `dev` esté estable y probado (las 6 operaciones funcionando con los 2
+clientes), Ismael abre el PR final de `dev` → `main`:
 
 ```bash
 git checkout main
 git pull origin main
-git merge origin/desarrollo
+git merge origin/dev
 git push origin main
 ```
 
@@ -122,8 +132,8 @@ commit siguiente (queda en el historial).
 
 ## 6. Checklist antes de la entrega final
 
-- [ ] Todas las `feature/*` fueron mergeadas a `desarrollo` vía Pull Request.
-- [ ] `desarrollo` fue mergeada a `main` (ver último paso de la sección 3).
+- [ ] Todas las `feature/*` fueron mergeadas a `dev` vía Pull Request.
+- [ ] `dev` fue mergeada a `main` (ver último paso de la sección 3).
 - [ ] `main` tiene el código de servidor + 2 clientes + WSDL, todo probado.
 - [ ] Cada integrante hizo al menos un commit visible con su parte.
 - [ ] Carpeta `evidencias/` con capturas de servidor, clientes y SoapUI.
