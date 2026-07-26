@@ -1,0 +1,18 @@
+{
+  "name": "servidor-soap-productos",
+  "version": "1.0.0",
+  "description": "Servidor SOAP de gestion de productos (Tarea Aplicaciones Distribuidas)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["soap", "wsdl", "node.js"],
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "soap": "^1.1.4"
+  }
+}

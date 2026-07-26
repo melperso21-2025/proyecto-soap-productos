@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="ProductosService"
+  targetNamespace="http://productos.tarea.com/wsdl"
+  xmlns:tns="http://productos.tarea.com/wsdl"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <!-- ============================================================ -->
+  <!-- TYPES: estructuras de datos usadas por las operaciones        -->
+  <!-- ============================================================ -->
+  <types>
+    <xsd:schema targetNamespace="http://productos.tarea.com/wsdl">
+
+      <xsd:complexType name="Producto">
+        <xsd:sequence>
+          <xsd:element name="codigo" type="xsd:string"/>
+          <xsd:element name="nombre" type="xsd:string"/>
+          <xsd:element name="categoria" type="xsd:string"/>
+          <xsd:element name="precio" type="xsd:decimal"/>
+          <xsd:element name="cantidad" type="xsd:int"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <!-- RegistrarProducto -->
+      <xsd:element name="RegistrarProductoRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigo" type="xsd:string"/>
+            <xsd:element name="nombre" type="xsd:string"/>
+            <xsd:element name="categoria" type="xsd:string"/>
+            <xsd:element name="precio" type="xsd:decimal"/>
+            <xsd:element name="cantidad" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="RegistrarProductoResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- ConsultarProducto -->
+      <xsd:element name="ConsultarProductoRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigo" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ConsultarProductoResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+            <xsd:element name="codigo" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="nombre" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="categoria" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="precio" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="cantidad" type="xsd:int" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- ListarProductos -->
+      <xsd:element name="ListarProductosRequest">
+        <xsd:complexType>
+          <xsd:sequence/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ListarProductosResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="productos" type="tns:Producto" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- ActualizarStock -->
+      <xsd:element name="ActualizarStockRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigo" type="xsd:string"/>
+            <xsd:element name="cantidad" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ActualizarStockResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+            <xsd:element name="cantidadActualizada" type="xsd:int" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- CalcularValorInventario -->
+      <xsd:element name="CalcularValorInventarioRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigo" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CalcularValorInventarioResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+            <xsd:element name="nombre" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="precio" type="xsd:decimal" minOccurs="0"/>
+            <xsd:element name="cantidad" type="xsd:int" minOccurs="0"/>
+            <xsd:element name="valorTotal" type="xsd:decimal" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- EliminarProducto -->
+      <xsd:element name="EliminarProductoRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigo" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="EliminarProductoResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+    </xsd:schema>
+  </types>
+
+  <!-- ============================================================ -->
+  <!-- MESSAGES: qué viaja de entrada y de salida por cada operación -->
+  <!-- ============================================================ -->
+  <message name="RegistrarProductoInput">
+    <part name="parameters" element="tns:RegistrarProductoRequest"/>
+  </message>
+  <message name="RegistrarProductoOutput">
+    <part name="parameters" element="tns:RegistrarProductoResponse"/>
+  </message>
+
+  <message name="ConsultarProductoInput">
+    <part name="parameters" element="tns:ConsultarProductoRequest"/>
+  </message>
+  <message name="ConsultarProductoOutput">
+    <part name="parameters" element="tns:ConsultarProductoResponse"/>
+  </message>
+
+  <message name="ListarProductosInput">
+    <part name="parameters" element="tns:ListarProductosRequest"/>
+  </message>
+  <message name="ListarProductosOutput">
+    <part name="parameters" element="tns:ListarProductosResponse"/>
+  </message>
+
+  <message name="ActualizarStockInput">
+    <part name="parameters" element="tns:ActualizarStockRequest"/>
+  </message>
+  <message name="ActualizarStockOutput">
+    <part name="parameters" element="tns:ActualizarStockResponse"/>
+  </message>
+
+  <message name="CalcularValorInventarioInput">
+    <part name="parameters" element="tns:CalcularValorInventarioRequest"/>
+  </message>
+  <message name="CalcularValorInventarioOutput">
+    <part name="parameters" element="tns:CalcularValorInventarioResponse"/>
+  </message>
+
+  <message name="EliminarProductoInput">
+    <part name="parameters" element="tns:EliminarProductoRequest"/>
+  </message>
+  <message name="EliminarProductoOutput">
+    <part name="parameters" element="tns:EliminarProductoResponse"/>
+  </message>
+
+  <!-- ============================================================ -->
+  <!-- PORTTYPE: el "contrato" con las 6 operaciones del servicio    -->
+  <!-- ============================================================ -->
+  <portType name="ProductosPortType">
+    <operation name="RegistrarProducto">
+      <input message="tns:RegistrarProductoInput"/>
+      <output message="tns:RegistrarProductoOutput"/>
+    </operation>
+    <operation name="ConsultarProducto">
+      <input message="tns:ConsultarProductoInput"/>
+      <output message="tns:ConsultarProductoOutput"/>
+    </operation>
+    <operation name="ListarProductos">
+      <input message="tns:ListarProductosInput"/>
+      <output message="tns:ListarProductosOutput"/>
+    </operation>
+    <operation name="ActualizarStock">
+      <input message="tns:ActualizarStockInput"/>
+      <output message="tns:ActualizarStockOutput"/>
+    </operation>
+    <operation name="CalcularValorInventario">
+      <input message="tns:CalcularValorInventarioInput"/>
+      <output message="tns:CalcularValorInventarioOutput"/>
+    </operation>
+    <operation name="EliminarProducto">
+      <input message="tns:EliminarProductoInput"/>
+      <output message="tns:EliminarProductoOutput"/>
+    </operation>
+  </portType>
+
+  <!-- ============================================================ -->
+  <!-- BINDING: cómo se transporta el contrato (SOAP sobre HTTP)     -->
+  <!-- ============================================================ -->
+  <binding name="ProductosBinding" type="tns:ProductosPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <operation name="RegistrarProducto">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/RegistrarProducto"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="ConsultarProducto">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/ConsultarProducto"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="ListarProductos">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/ListarProductos"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="ActualizarStock">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/ActualizarStock"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="CalcularValorInventario">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/CalcularValorInventario"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="EliminarProducto">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/EliminarProducto"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+  </binding>
+
+  <!-- ============================================================ -->
+  <!-- SERVICE / PORT: dónde vive el servicio                       -->
+  <!-- ============================================================ -->
+  <service name="ProductosService">
+    <port name="ProductosPort" binding="tns:ProductosBinding">
+      <soap:address location="http://localhost:8000/productos"/>
+    </port>
+  </service>
+
+</definitions>
