@@ -120,4 +120,7 @@ def eliminar(codigo):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    # debug=False a proposito: el debugger interactivo de Flask permite
+    # ejecutar codigo arbitrario desde el navegador si algo falla - no debe
+    # activarse ni siquiera en la demo local de la defensa.
+    app.run(debug=False, port=5000)
