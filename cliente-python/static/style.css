@@ -70,13 +70,20 @@ a{color:inherit;}
 
 .brand{display:flex; align-items:center; gap:0.65rem; padding:0 0.4rem 1.4rem; margin-bottom:1.2rem; border-bottom:1px solid var(--sidebar-line);}
 .brand-mark{
-  width:2rem; height:2rem; border-radius:5px; background:var(--sidebar-accent);
+  min-width:2rem; height:2rem; padding:0 0.35rem; border-radius:5px; background:var(--sidebar-accent);
   display:flex; align-items:center; justify-content:center; color:var(--sidebar-bg);
-  font-family:var(--font-mono); font-size:0.8rem; font-weight:700; flex:none;
+  font-family:var(--font-mono); font-size:0.72rem; font-weight:700; flex:none;
 }
 .brand-text{display:flex; flex-direction:column; min-width:0;}
 .brand-name{font-family:var(--font-display); font-size:1.05rem; color:var(--sidebar-ink-active); line-height:1.2;}
 .brand-sub{font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.04em; color:var(--sidebar-ink); opacity:0.8;}
+
+.lang-badge{
+  display:inline-flex; align-self:flex-start; margin:0.9rem 0.4rem 1.3rem;
+  padding:0.3rem 0.65rem; border-radius:99px; background:var(--sidebar-bg-2);
+  border:1px solid var(--sidebar-line); color:var(--sidebar-accent);
+  font-family:var(--font-mono); font-size:0.68rem; letter-spacing:0.03em;
+}
 
 .nav-label{
   font-family:var(--font-body); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.09em;
@@ -106,7 +113,10 @@ a{color:inherit;}
   margin-top:auto; padding-top:1rem; border-top:1px solid var(--sidebar-line);
   font-family:var(--font-mono); font-size:0.68rem; color:var(--sidebar-ink); opacity:0.75;
 }
-.sidebar-footer .team{margin-top:0.35rem; line-height:1.6;}
+.sidebar-footer .team{margin-top:0.5rem; display:flex; flex-direction:column; gap:0.4rem;}
+.team-row{display:flex; flex-direction:column;}
+.team-nombre{color:var(--sidebar-ink-active); font-size:0.72rem;}
+.team-rol{opacity:0.75; font-size:0.64rem;}
 
 /* ---------------- MAIN ---------------- */
 main{padding:2rem clamp(1.25rem, 3vw, 2.75rem) 4rem; min-width:0;}

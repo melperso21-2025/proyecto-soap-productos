@@ -14,11 +14,13 @@ que, tras recargar, siga viendo la pestana en la que estaba trabajando.
 Requiere el servidor Node.js corriendo (npm start en /servidor).
 """
 
+import requests
 from flask import Flask, flash, redirect, render_template, request, url_for
 from zeep import Client
 from zeep.exceptions import Fault, TransportError
 
 WSDL_URL = "http://localhost:8000/productos?wsdl"
+API_EQUIPO_URL = "http://localhost:8000/api/equipo"
 VISTAS = ("registrar", "consultar", "listar", "stock", "valor", "eliminar")
 UMBRAL_BAJO_STOCK = 5
 
@@ -37,6 +39,17 @@ def ir_a(vista, **query):
     if vista not in VISTAS:
         vista = "listar"
     return redirect(url_for("index", view=vista, **query))
+
+
+def obtener_equipo():
+    """Consulta la API REST del servidor (no SOAP) para mostrar quien
+    hizo el proyecto - demuestra el uso real de la capa REST."""
+    try:
+        respuesta = requests.get(API_EQUIPO_URL, timeout=3)
+        respuesta.raise_for_status()
+        return respuesta.json()
+    except requests.RequestException:
+        return []
 
 
 @app.route("/")
@@ -91,6 +104,7 @@ def index():
         codigo_prefill=request.args.get("codigo", ""),
         resultado_consulta=resultado_consulta,
         resultado_valor=resultado_valor,
+        equipo=obtener_equipo(),
     )
 
 

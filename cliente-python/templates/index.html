@@ -10,12 +10,13 @@
   <div class="shell">
     <nav class="sidebar" aria-label="Operaciones del servicio">
       <div class="brand">
-        <div class="brand-mark">P</div>
+        <div class="brand-mark">Py</div>
         <div class="brand-text">
           <span class="brand-name">Panel Productos</span>
           <span class="brand-sub">SOAP · productos.wsdl</span>
         </div>
       </div>
+      <div class="lang-badge">Cliente Python · Flask + zeep</div>
 
       <div class="nav-label">Las 6 operaciones</div>
       <div class="nav">
@@ -53,7 +54,15 @@
 
       <div class="sidebar-footer">
         Bonus opcional · no exigido por el PDF de la tarea
-        <div class="team">Equipo: Ismael · Alexandra · Israel · Diego</div>
+        <div class="team">
+          {% if equipo %}
+            {% for integrante in equipo %}
+              <div class="team-row"><span class="team-nombre">{{ integrante.nombre }}</span><span class="team-rol">{{ integrante.rol }}</span></div>
+            {% endfor %}
+          {% else %}
+            Equipo no disponible (falló GET /api/equipo)
+          {% endif %}
+        </div>
       </div>
     </nav>
 
