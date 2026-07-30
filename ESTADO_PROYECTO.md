@@ -8,15 +8,19 @@
 
 | Integrante | Responsabilidad principal | Rama de trabajo |
 |---|---|---|
-| **Ismael** | Servidor SOAP (server.js), WSDL | `feature/servidor` |
+| **Ismael** | Servidor SOAP (server.js), WSDL, API REST, front web PHP | `feature/servidor` |
 | **Alexandra** | Validaciones, mensajes de error, pruebas del WSDL en SoapUI, empaquetado final | `feature/validaciones` |
-| **Israel** | Cliente Python (zeep), marco teórico del informe | `feature/cliente-python` |
-| **Diego** | Cliente PHP (SoapClient), marco teórico del informe | `feature/cliente-php` |
+| **Israel** | Cliente y front web Python, marco teórico del informe | `feature/cliente-python` |
 | **Equipo** | Pruebas SoapUI, revisión cruzada de código, ensayo de defensa | — |
 
-Modalidad de entrega: 4 personas (confirmado con el docente), pero recuerden
-que igual cada quien entrega su propio zip `Apellido_Nombre_TareaSOAP.zip`,
-informe y defensa virtual individual (sección 1 y 13 del PDF de la tarea).
+> ⚠️ **Diego ya no forma parte del equipo.** Su trabajo original (cliente
+> PHP, `feature/cliente-php`) pasó a Ismael, quien además lo amplió con un
+> front web (antes solo era un cliente de consola). El equipo quedó en 3
+> personas.
+>
+> La modalidad de "grupo de 4" se había confirmado antes con el docente —
+> **avísenle del cambio a 3 integrantes** antes de la entrega, para no tener
+> sorpresas en la defensa virtual.
 
 ## Objetivo general
 
@@ -38,33 +42,46 @@ PHP) y pruebas en SoapUI.
 
 - [x] `productos.wsdl` — las 6 operaciones (types, message, portType, binding,
       service, port), validado y funcionando en `http://localhost:8000/productos?wsdl`.
-- [x] `servidor/server.js` — las 6 operaciones probadas de punta a punta:
-      RegistrarProducto, ConsultarProducto, ListarProductos, ActualizarStock,
-      CalcularValorInventario, EliminarProducto.
+- [x] `servidor/server.js` + `servidor/operaciones.js` — las 6 operaciones
+      probadas de punta a punta: RegistrarProducto, ConsultarProducto,
+      ListarProductos, ActualizarStock, CalcularValorInventario,
+      EliminarProducto.
 - [x] `servidor/validaciones.js` — código no vacío/no duplicado, precio > 0,
-      cantidad entera ≥ 0, producto debe existir. (**Alexandra: revisar y
-      hacerlo tuyo, ver sección "Qué hacer ahora"**).
+      cantidad entera ≥ 0, producto debe existir. (**Alexandra: ya lo
+      revisaste y agregaste el caso de código duplicado, gracias**).
 - [x] Persistencia híbrida con Supabase — memoria como fuente de verdad,
       Supabase conectado y probado con datos reales (proyecto ya creado).
-- [x] `cliente-python/client.py` — las 7 demostraciones mínimas del PDF,
-      probado contra el servidor real.
-- [x] `cliente-php/client.php` — las mismas 7 demostraciones, probado.
-- [x] Repositorio en GitHub con ramas `main`, `dev` y las 5 `feature/*`.
+- [x] **API REST** (`servidor/rest.js`) sobre el mismo servidor/puerto 8000:
+      `GET/POST/PATCH/DELETE /api/productos...` y `GET /api/equipo`, probada
+      de punta a punta y coexistiendo con el WSDL sin conflicto.
+- [x] `cliente-python/client.py` (consola) — las 7 demostraciones mínimas del
+      PDF, probado contra el servidor real.
+- [x] `cliente-python/app.py` — front web Flask, menú lateral con las 6
+      operaciones, badge de lenguaje, equipo dinámico vía `GET /api/equipo`.
+      Puerto 5000.
+- [x] `cliente-php/client.php` (consola) — las mismas 7 demostraciones, probado.
+- [x] `cliente-php/front/index.php` — front web en PHP puro (sin framework),
+      espejo funcional del de Python, mismo diseño, badge y equipo dinámico.
+      Puerto 5001, corre en paralelo al de Python sin chocar.
+- [x] Repositorio en GitHub con ramas `main`, `dev` y las `feature/*`.
 - [x] Guías: [`GUIA_SUPABASE.md`](GUIA_SUPABASE.md),
       [`GUIA_GITHUB.md`](GUIA_GITHUB.md), [`GUIA_DESPLIEGUE.md`](GUIA_DESPLIEGUE.md).
-- [x] Wireframe del dashboard bonus (opcional, no exigido por el PDF).
+- [x] Wireframe del dashboard bonus, aplicado a ambos fronts (no exigido por
+      el PDF).
 
 ## Qué falta ⏳
 
 ### Ismael
-- [ ] Invitar a Alexandra, Israel y Diego como colaboradores en GitHub
-      (Settings → Collaborators).
-- [ ] Pasarles por canal privado (WhatsApp/Discord, **no** GitHub): la URL
-      del repo y el valor real de `SUPABASE_KEY` para su `.env` local.
+- [ ] Avisar al docente que el equipo quedó en 3 integrantes (Diego salió).
+- [ ] Invitar a Alexandra e Israel como colaboradores en GitHub si aún no lo
+      están (Settings → Collaborators).
+- [ ] Ejecutar `servidor/db/schema_integrantes.sql` en el SQL Editor de
+      Supabase (tabla `integrantes` — mientras no exista, `/api/equipo`
+      funciona con un respaldo hardcodeado, pero conviene tener la real).
 - [ ] Cuando el equipo lo decida: desplegar en Render
       ([`GUIA_DESPLIEGUE.md`](GUIA_DESPLIEGUE.md)) — no urgente, es bonus.
 
-### Cada compañero (Alexandra, Israel, Diego) — primer paso
+### Cada compañero (Alexandra, Israel) — primer paso
 - [ ] Clonar el repo y pararse en tu rama (`git checkout feature/tu-rama`,
       ver sección 3 de [`GUIA_GITHUB.md`](GUIA_GITHUB.md)).
 - [ ] Copiar `servidor/.env.example` a `servidor/.env` y pegar la
@@ -73,28 +90,25 @@ PHP) y pruebas en SoapUI.
       nada (`npm install` + `npm start` en `servidor/`, luego tu cliente).
 
 ### Alexandra (`feature/validaciones`)
-- [ ] **Leer y entender `servidor/validaciones.js` a fondo** — está escrito,
-      pero en la defensa virtual te van a pedir que lo expliques y modifiques
-      en vivo. No lo dejes como "caja negra".
-- [ ] Confirmar que cubre los 7 casos de la sección 11 del PDF (código
-      vacío/duplicado, nombre/categoría vacíos, precio ≤ 0, cantidad < 0,
-      producto inexistente).
+- [x] Leer `servidor/validaciones.js`, confirmar cobertura de los 7 casos de
+      la sección 11 del PDF, agregar el caso de código duplicado.
 - [ ] Importar `productos.wsdl` en SoapUI y dejar preparados los 12+ casos
       de prueba (1 correcto + 1 incorrecto por cada una de las 6 operaciones).
-- [ ] Guardar capturas en `evidencias/` (WSDL importado, request XML,
-      response XML, por operación).
+      *(Ya tienes el checklist en `evidencias/checklist_soapui.md`.)*
+- [x] Guardar capturas en `evidencias/` (WSDL importado, request XML,
+      response XML, por operación) — 14 evidencias subidas.
 - [ ] Al final: empaquetar el zip de entrega (`Apellido_Nombre_TareaSOAP.zip`).
 
 ### Israel (`feature/cliente-python`)
-- [ ] Leer `cliente-python/client.py` y entender cómo `zeep` consume el WSDL.
+- [x] Cliente de consola (`client.py`) y front web (`app.py`) construidos y
+      probados.
+- [ ] Revisar el rediseño del front (menú lateral, badge, equipo vía REST) —
+      cambió bastante desde tu primera versión, tómate un momento para
+      entenderlo antes de la defensa.
 - [ ] Aportar al marco teórico del informe: SOAP, XML, WSDL, cliente-servidor,
-      SOAP vs REST (sección 12 del PDF).
-
-### Diego (`feature/cliente-php`)
-- [ ] Leer `cliente-php/client.php` y entender cómo `SoapClient` nativo
-      consume el WSDL (necesita la extensión `soap` habilitada en su
-      `php.ini` local — ver nota en el archivo).
-- [ ] Aportar al marco teórico del informe (mismo alcance que Israel).
+      SOAP vs REST (sección 12 del PDF) — ahora el proyecto también expone
+      REST, así que la comparación SOAP vs REST se puede ilustrar con
+      ejemplos reales de este mismo backend.
 
 ### Equipo (todos)
 - [ ] Revisión cruzada de código: cada quien revisa la parte de un
@@ -102,13 +116,14 @@ PHP) y pruebas en SoapUI.
 - [ ] Informe técnico en PDF (`informe/`): introducción, objetivos, marco
       teórico, arquitectura (diagrama cliente-servidor), desarrollo,
       evidencias, análisis de resultados, conclusiones (mín. 3),
-      recomendaciones (mín. 2), bibliografía APA 7.
+      recomendaciones (mín. 2), bibliografía APA 7. Mencionar la API REST
+      como mejora adicional, ademas de Supabase.
 - [ ] Ensayar la defensa virtual: cada integrante debe poder explicar y
       modificar en vivo **su** parte del código (1.5 pts de la rúbrica).
 
 ## Por qué el código ya está hecho
 
-Para que puedan avanzar en paralelo desde ya (WSDL, servidor y clientes
-listos), pero esto **no reemplaza que cada quien entienda su parte**: la
-rúbrica da 1.5 puntos solo a la defensa virtual, y ahí piden explicar y
+Para que puedan avanzar en paralelo desde ya (WSDL, servidor, API REST y
+fronts listos), pero esto **no reemplaza que cada quien entienda su parte**:
+la rúbrica da 1.5 puntos solo a la defensa virtual, y ahí piden explicar y
 modificar el código en vivo — no basta con que "funcione".

@@ -1,6 +1,6 @@
-# Guía: Supabase para el equipo (Ismael, Alexandra, Israel, Diego)
+# Guía: Supabase para el equipo (Ismael, Alexandra, Israel)
 
-Esta guía es para Ismael (dueño del proyecto Supabase) y para los 3 compañeros que
+Esta guía es para Ismael (dueño del proyecto Supabase) y para los 2 compañeros que
 necesitan acceso. El plan gratuito de Supabase permite invitar miembros a la
 **organización**, no solo ver el proyecto — así que todos pueden entrar al mismo
 dashboard, ver tablas, datos y logs.
@@ -24,6 +24,16 @@ dashboard, ver tablas, datos y logs.
 3. Verifica en **Table Editor** que la tabla `productos` aparece con sus columnas y
    restricciones (código único, precio > 0, cantidad >= 0).
 
+## 2b. Crear la tabla `integrantes` (para el endpoint `GET /api/equipo`)
+
+1. **SQL Editor** → **New query** de nuevo.
+2. Pega el contenido de
+   [`servidor/db/schema_integrantes.sql`](servidor/db/schema_integrantes.sql)
+   y presiona **Run**. Ya viene con los 3 nombres del equipo precargados.
+3. Mientras no ejecutes esto, `/api/equipo` sigue funcionando con una lista
+   de respaldo fija en el código — no bloquea nada, pero conviene tener la
+   tabla real para que la defensa muestre datos "de verdad" desde Supabase.
+
 ## 3. Obtener las credenciales para el `.env`
 
 1. **Project Settings** (ícono de engranaje) → **Data API**.
@@ -42,11 +52,11 @@ cp servidor/.env.example servidor/.env
 > usa una política abierta (ver `schema.sql`) porque no se manejan datos
 > sensibles — así evitan pelear con RLS mientras aprenden.
 
-## 4. Invitar a los 3 compañeros (Ismael hace esto una sola vez)
+## 4. Invitar a los 2 compañeros (Ismael hace esto una sola vez)
 
 1. Ve a **Organization Settings** (no Project Settings) → **Team**.
-2. **Invite member** → ingresa el correo de cada compañero (Alexandra, Israel,
-   Diego), uno a la vez.
+2. **Invite member** → ingresa el correo de cada compañero (Alexandra, Israel),
+   uno a la vez.
 3. Rol sugerido: **Developer** (puede ver/editar tablas y código, no puede borrar
    el proyecto ni facturación). Si prefieres que solo miren datos: **Read-only**.
 4. Cada compañero revisa su correo, acepta la invitación y crea/inicia sesión en

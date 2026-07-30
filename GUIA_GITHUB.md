@@ -1,4 +1,8 @@
-# Guía: GitHub para el equipo (Ismael, Alexandra, Israel, Diego)
+# Guía: GitHub para el equipo (Ismael, Alexandra, Israel)
+
+> Diego formaba parte del equipo original pero ya no participa en el
+> proyecto. Su rama (`feature/cliente-php`) y esa parte del trabajo quedaron
+> a cargo de Ismael, quien además la amplió con un front web en PHP.
 
 ## Estado actual
 
@@ -11,13 +15,13 @@ Ya está hecho (Ismael):
   `feature/servidor`, `feature/validaciones`, `feature/cliente-python`,
   `feature/cliente-php`, `feature/informe`.
 
-Lo que falta: invitar a los 3 compañeros (sección 1) y que cada uno se pare
-sobre **su** rama `feature/*` (sección 3).
+Lo que falta: confirmar que Alexandra e Israel ya son colaboradores
+(sección 1) y que cada uno se pare sobre **su** rama `feature/*` (sección 3).
 
-## 1. Invitar a los 3 compañeros (Ismael, una sola vez)
+## 1. Invitar a Alexandra e Israel (Ismael, una sola vez)
 
 1. En el repo → **Settings** → **Collaborators** → **Add people**.
-2. Busca por su usuario o correo de GitHub: Alexandra, Israel, Diego.
+2. Busca por su usuario o correo de GitHub: Alexandra, Israel.
 3. Rol: **Write** (pueden hacer push y abrir PRs, no pueden borrar el repo ni
    cambiar configuración crítica).
 4. Cada compañero acepta la invitación (le llega notificación/correo).
@@ -29,7 +33,7 @@ git clone https://github.com/melperso21-2025/proyecto-soap-productos.git
 cd proyecto-soap-productos
 ```
 
-## 3. Estrategia de ramas (simple, pensada para 4 personas y 4 días)
+## 3. Estrategia de ramas (simple, pensada para 3 personas)
 
 Tres niveles, de más estable a más experimental:
 
@@ -38,17 +42,18 @@ Tres niveles, de más estable a más experimental:
   en puntos de control (ej. fin del día 3 y antes de la entrega final), nunca
   a cada rato.
 - **`dev`** — rama de trabajo compartida del equipo. Todo el mundo arranca y
-  termina su día aquí. Es donde se juntan las 4 partes antes de pasar a
-  `main`.
-- **`feature/*`** — una rama corta por responsabilidad, siguiendo el plan de
-  trabajo del Excel, que sale de `dev` y vuelve a `dev`. Ya están creadas en
-  GitHub, cada quien trabaja en la suya:
-  - `feature/servidor` (Ismael) — server.js, WSDL, arranque del servidor.
+  termina su día aquí. Es donde se juntan las partes antes de pasar a `main`.
+- **`feature/*`** — una rama corta por responsabilidad, que sale de `dev` y
+  vuelve a `dev`. Ya están creadas en GitHub, cada quien trabaja en la suya:
+  - `feature/servidor` (Ismael) — server.js, operaciones.js, rest.js, WSDL,
+    arranque del servidor.
   - `feature/validaciones` (Alexandra) — validaciones.js, mensajes de
     error estándar, pruebas de WSDL en SoapUI.
-  - `feature/cliente-python` (Israel) — cliente-python/.
-  - `feature/cliente-php` (Diego) — cliente-php/.
-  - `feature/informe` (Israel + Diego, luego Ismael consolida) — informe/.
+  - `feature/cliente-python` (Israel) — cliente-python/ (cliente de consola
+    y front Flask).
+  - `feature/cliente-php` (Ismael, ya que Diego salió del equipo) —
+    cliente-php/ (cliente de consola y front PHP).
+  - `feature/informe` (Israel, luego Ismael consolida) — informe/.
 
 ```
 feature/servidor ───────┐
@@ -75,8 +80,8 @@ git checkout feature/cliente-python
 ```
 
 Git reconoce que `origin/feature/cliente-python` ya existe y conecta tu rama
-local con ella automáticamente. Diego haría lo mismo con
-`feature/cliente-php`, Alexandra con `feature/validaciones`, y así cada quien.
+local con ella automáticamente. Alexandra haría lo mismo con
+`feature/validaciones`, y así cada quien.
 
 ### Flujo diario (una vez ya estás en tu rama)
 

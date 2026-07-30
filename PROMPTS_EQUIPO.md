@@ -1,4 +1,8 @@
-# Prompts para Alexandra, Israel y Diego
+# Prompts para Alexandra e Israel
+
+> Diego formaba parte del equipo original pero ya no participa en el
+> proyecto — su prompt se retiró de este archivo. Su trabajo (cliente PHP)
+> quedó a cargo de Ismael, quien ya lo amplió con un front web propio.
 
 Estos son los mensajes que cada uno le puede pegar a su asistente de IA
 (Claude Code u otro) para avanzar en su parte del proyecto. Cada prompt es
@@ -29,7 +33,6 @@ importar quién lo use ni en qué momento.
 |---|---|---|
 | Alexandra | `feature/validaciones` | [Ir al prompt](#prompt-para-alexandra) |
 | Israel | `feature/cliente-python` | [Ir al prompt](#prompt-para-israel) |
-| Diego | `feature/cliente-php` | [Ir al prompt](#prompt-para-diego) |
 
 ---
 
@@ -109,51 +112,11 @@ Ayúdame con esto, en orden:
    registro de 2 productos, consulta existente, consulta inexistente,
    listado, actualización de stock, cálculo de inventario, eliminación.
 
-3. Ayúdame a preparar mis notas para el marco teórico del informe técnico
-   (sección 12 del enunciado), cubriendo: aplicaciones distribuidas,
-   servicios web, protocolo SOAP, lenguaje XML, archivo WSDL, arquitectura
-   cliente-servidor, y diferencias entre SOAP y REST. Quiero que me
-   expliques cada concepto con ejemplos de ESTE proyecto (no genéricos), y
-   que me ayudes a organizar mis propias notas en viñetas — el texto final
-   del informe lo redacto yo con mis palabras.
-
-Ve paso a paso, y hazme preguntas de vez en cuando para confirmar que
-entendí antes de seguir.
-```
-
----
-
-## Prompt para Diego
-
-**Tu responsabilidad:** cliente PHP (SoapClient nativo), y el marco teórico
-del informe (mismo alcance que Israel).
-
-```text
-Estoy en el proyecto proyecto-soap-productos: un servicio SOAP de gestión de
-productos en Node.js (tarea de Aplicaciones Distribuidas), con un archivo
-WSDL en servidor/productos.wsdl y un servidor con 6 operaciones. Estoy en la
-rama feature/cliente-php. Mi parte del equipo es: el cliente en PHP
-(cliente-php/client.php, usando la clase nativa SoapClient) y el marco
-teórico del informe. Soy estudiante y estoy aprendiendo — quiero entender,
-no solo que funcione.
-
-Ayúdame con esto, en orden:
-
-1. Antes que nada, revisa si mi PHP tiene habilitada la extensión "soap"
-   (php -m debe mostrarla). Si no aparece, ayúdame a habilitarla en mi
-   php.ini local (buscar la línea ";extension=soap" y quitarle el ";").
-
-2. Lee cliente-php/client.php y explícame, en las partes clave, cómo
-   SoapClient se conecta al WSDL (new SoapClient(WSDL_URL, [...])) y cómo
-   invoca cada una de las 6 operaciones del servicio. Quiero poder explicar
-   esto en vivo en la defensa virtual y también modificarlo si el profesor
-   pide agregar un caso de prueba nuevo.
-
-3. Corre el cliente conmigo (con el servidor ya levantado en otra terminal
-   con "npm start" desde la carpeta servidor/) y ayúdame a interpretar la
-   salida de cada una de las 7 demostraciones que pide el enunciado:
-   registro de 2 productos, consulta existente, consulta inexistente,
-   listado, actualización de stock, cálculo de inventario, eliminación.
+3. También lee cliente-python/app.py y templates/index.html: es el front web
+   (Flask) con menú lateral que consume el mismo WSDL, más GET /api/equipo
+   (la API REST del servidor) para mostrar al equipo. Cambió bastante desde
+   que lo armé por primera vez — quiero entender cada ruta y cada vista
+   antes de la defensa, no solo que se vea bien.
 
 4. Ayúdame a preparar mis notas para el marco teórico del informe técnico
    (sección 12 del enunciado), cubriendo: aplicaciones distribuidas,
@@ -161,8 +124,7 @@ Ayúdame con esto, en orden:
    cliente-servidor, y diferencias entre SOAP y REST. Quiero que me
    expliques cada concepto con ejemplos de ESTE proyecto (no genéricos), y
    que me ayudes a organizar mis propias notas en viñetas — el texto final
-   del informe lo redacto yo con mis palabras. Coordina conmigo con Israel
-   para no repetir exactamente lo mismo en el informe.
+   del informe lo redacto yo con mis palabras.
 
 Ve paso a paso, y hazme preguntas de vez en cuando para confirmar que
 entendí antes de seguir.
