@@ -113,11 +113,21 @@ PHP) y pruebas en SoapUI.
 ### Equipo (todos)
 - [ ] Revisión cruzada de código: cada quien revisa la parte de un
       compañero y deja comentarios en el Pull Request antes de aprobar.
-- [ ] Informe técnico en PDF (`informe/`): introducción, objetivos, marco
-      teórico, arquitectura (diagrama cliente-servidor), desarrollo,
-      evidencias, análisis de resultados, conclusiones (mín. 3),
-      recomendaciones (mín. 2), bibliografía APA 7. Mencionar la API REST
-      como mejora adicional, ademas de Supabase.
+- [x] Informe técnico en PDF (`informe/informe_tecnico.pdf`): introducción,
+      objetivos, marco teórico, arquitectura (diagrama con las 3 instancias),
+      desarrollo, evidencias, análisis de resultados, conclusiones,
+      recomendaciones, bibliografía APA 7. Incluye la API REST como mejora
+      adicional. **Pendiente antes de entregar:**
+  - [ ] Completar apellidos de los 3 integrantes y nombre del docente en la
+        portada (quedaron como `[Apellido]` / `[Nombre del docente]`).
+  - [ ] Reemplazar los 4 recuadros "[ESPACIO PARA CAPTURA]" de la sección de
+        Evidencias con capturas reales: consola del servidor corriendo,
+        WSDL en el navegador, consola de `client.py`, consola de `client.php`.
+        El documento ya dice exactamente qué comando correr y qué capturar
+        en cada caso.
+  - [ ] `informe/informe_tecnico.docx` es el editable (por si hay que ajustar
+        texto); el `.pdf` es el que se entrega.
+- [ ] Empaquetar el zip final una vez completado lo anterior.
 - [ ] Ensayar la defensa virtual: cada integrante debe poder explicar y
       modificar en vivo **su** parte del código (1.5 pts de la rúbrica).
 
