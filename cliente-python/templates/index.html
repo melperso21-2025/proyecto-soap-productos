@@ -7,77 +7,263 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header>
-    <h1>Dashboard de Productos</h1>
-    <p class="subtitulo">Consume el mismo servicio SOAP que <code>cliente-python/client.py</code></p>
-  </header>
+  <div class="shell">
+    <nav class="sidebar" aria-label="Operaciones del servicio">
+      <div class="brand">
+        <div class="brand-mark">P</div>
+        <div class="brand-text">
+          <span class="brand-name">Panel Productos</span>
+          <span class="brand-sub">SOAP · productos.wsdl</span>
+        </div>
+      </div>
 
-  {% with mensajes = get_flashed_messages(with_categories=true) %}
-    {% if mensajes %}
-      <ul class="mensajes">
-        {% for categoria, texto in mensajes %}
-          <li class="{{ categoria }}">{{ texto }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+      <div class="nav-label">Las 6 operaciones</div>
+      <div class="nav">
+        <a class="nav-item {{ 'active' if vista == 'registrar' }}" href="{{ url_for('index', view='registrar') }}">
+          <span class="num">01</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+          Registrar producto
+        </a>
+        <a class="nav-item {{ 'active' if vista == 'consultar' }}" href="{{ url_for('index', view='consultar') }}">
+          <span class="num">02</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>
+          Consultar producto
+        </a>
+        <a class="nav-item {{ 'active' if vista == 'listar' }}" href="{{ url_for('index', view='listar') }}">
+          <span class="num">03</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>
+          Listar productos
+        </a>
+        <a class="nav-item {{ 'active' if vista == 'stock' }}" href="{{ url_for('index', view='stock') }}">
+          <span class="num">04</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V13M10 19V9M16 19V5M4 13l6-4 6-4 0 0"/><path d="M15 5h5v5"/></svg>
+          Actualizar stock
+        </a>
+        <a class="nav-item {{ 'active' if vista == 'valor' }}" href="{{ url_for('index', view='valor') }}">
+          <span class="num">05</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7.5h7M8 12h1M11.5 12h1M15 12h1M8 15.5h1M11.5 15.5h1M15 15.5h1"/></svg>
+          Calcular valor
+        </a>
+        <a class="nav-item {{ 'active' if vista == 'eliminar' }}" href="{{ url_for('index', view='eliminar') }}">
+          <span class="num">06</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-12"/><path d="M10 11v6M14 11v6"/></svg>
+          Eliminar producto
+        </a>
+      </div>
 
-  <main>
-    <section class="tarjeta">
-      <h2>Registrar producto</h2>
-      <form method="post" action="{{ url_for('registrar') }}" class="formulario">
-        <input name="codigo" placeholder="Código (ej. P100)" required>
-        <input name="nombre" placeholder="Nombre" required>
-        <input name="categoria" placeholder="Categoría" required>
-        <input name="precio" type="number" step="0.01" min="0.01" placeholder="Precio" required>
-        <input name="cantidad" type="number" min="0" placeholder="Cantidad" required>
-        <button type="submit">Registrar</button>
-      </form>
-    </section>
+      <div class="sidebar-footer">
+        Bonus opcional · no exigido por el PDF de la tarea
+        <div class="team">Equipo: Ismael · Alexandra · Israel · Diego</div>
+      </div>
+    </nav>
 
-    <section class="tarjeta">
-      <h2>Consultar producto por código</h2>
-      <form method="post" action="{{ url_for('consultar') }}" class="formulario">
-        <input name="codigo" placeholder="Código a consultar" required>
-        <button type="submit">Consultar</button>
-      </form>
-    </section>
-
-    <section class="tarjeta">
-      <h2>Productos registrados</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Código</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Cantidad</th><th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for p in productos %}
-          <tr>
-            <td>{{ p.codigo }}</td>
-            <td>{{ p.nombre }}</td>
-            <td>{{ p.categoria }}</td>
-            <td>{{ "%.2f"|format(p.precio) }}</td>
-            <td>{{ p.cantidad }}</td>
-            <td class="acciones">
-              <form method="post" action="{{ url_for('actualizar_stock') }}" class="inline">
-                <input type="hidden" name="codigo" value="{{ p.codigo }}">
-                <input name="cantidad" type="number" min="0" placeholder="nuevo stock" required class="input-corto">
-                <button type="submit">Actualizar</button>
-              </form>
-              <a class="boton-link" href="{{ url_for('calcular_valor', codigo=p.codigo) }}">Calcular valor</a>
-              <form method="post" action="{{ url_for('eliminar', codigo=p.codigo) }}" class="inline"
-                    onsubmit="return confirm('¿Eliminar {{ p.codigo }}?');">
-                <button type="submit" class="boton-peligro">Eliminar</button>
-              </form>
-            </td>
-          </tr>
-          {% else %}
-          <tr><td colspan="6" class="vacio">No hay productos registrados.</td></tr>
+    <main>
+      {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% if mensajes %}
+          {% for categoria, texto in mensajes %}
+            <div class="result {{ 'result-ok' if categoria == 'ok' else 'result-error' }}" style="margin-bottom:1.5rem;">
+              <div><b>{{ 'estado = true' if categoria == 'ok' else 'estado = false' }}</b>{{ texto }}</div>
+            </div>
           {% endfor %}
-        </tbody>
-      </table>
-    </section>
-  </main>
+        {% endif %}
+      {% endwith %}
+
+      <!-- ============ 01 REGISTRAR ============ -->
+      <section class="view {{ 'active' if vista == 'registrar' }}">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Operación 1 / 6 · RegistrarProducto</span>
+            <h1 class="page-title">Registrar producto</h1>
+            <p class="page-desc">Agrega un producto nuevo al inventario. El código debe ser único — si ya existe, el servicio lo rechaza.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+        </div>
+
+        <div class="card" style="max-width:32rem;">
+          <h3>Datos del producto <span class="tag">entrada</span></h3>
+          <form method="post" action="{{ url_for('registrar') }}">
+            <div class="field"><label for="r-codigo">Código</label><input id="r-codigo" name="codigo" placeholder="P202" required></div>
+            <div class="field"><label for="r-nombre">Nombre</label><input id="r-nombre" name="nombre" placeholder="Silla gamer" required></div>
+            <div class="field-row">
+              <div class="field"><label for="r-categoria">Categoría</label><input id="r-categoria" name="categoria" placeholder="Mobiliario" required></div>
+              <div class="field"><label for="r-precio">Precio</label><input id="r-precio" name="precio" type="number" step="0.01" min="0.01" placeholder="189.90" required></div>
+            </div>
+            <div class="field"><label for="r-cantidad">Cantidad</label><input id="r-cantidad" name="cantidad" type="number" min="0" placeholder="10" required></div>
+            <button class="btn btn-primary" type="submit">Registrar producto</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ 02 CONSULTAR ============ -->
+      <section class="view {{ 'active' if vista == 'consultar' }}">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Operación 2 / 6 · ConsultarProducto</span>
+            <h1 class="page-title">Consultar producto</h1>
+            <p class="page-desc">Busca un producto por su código y muestra su ficha completa.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Buscar por código <span class="tag">entrada</span></h3>
+            <form method="post" action="{{ url_for('consultar') }}">
+              <div class="field"><label for="c-codigo">Código</label><input id="c-codigo" name="codigo" value="{{ codigo_prefill }}" placeholder="P100" required></div>
+              <button class="btn btn-primary" type="submit">Consultar</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>Ficha del producto <span class="tag">salida</span></h3>
+            {% if resultado_consulta %}
+              <div class="kv">
+                <div class="kv-row"><span class="k">Código</span><span class="v">{{ resultado_consulta.codigo }}</span></div>
+                <div class="kv-row"><span class="k">Nombre</span><span class="v">{{ resultado_consulta.nombre }}</span></div>
+                <div class="kv-row"><span class="k">Categoría</span><span class="v">{{ resultado_consulta.categoria }}</span></div>
+                <div class="kv-row"><span class="k">Precio</span><span class="v">${{ "%.2f"|format(resultado_consulta.precio|float) }}</span></div>
+                <div class="kv-row"><span class="k">Cantidad</span><span class="v">{{ "%04d"|format(resultado_consulta.cantidad|int) }}</span></div>
+              </div>
+            {% else %}
+              <p class="vacio-nota">Todavía no has consultado ningún código en esta sesión.</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 03 LISTAR ============ -->
+      <section class="view {{ 'active' if vista == 'listar' }}">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Operación 3 / 6 · ListarProductos</span>
+            <h1 class="page-title">Productos registrados</h1>
+            <p class="page-desc">Vista general del inventario — no recibe parámetros de entrada.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+        </div>
+
+        <div class="kpi-row">
+          <div class="kpi"><div class="label">Productos registrados</div><div class="value">{{ total_productos }}</div></div>
+          <div class="kpi"><div class="label">Valor total inventario</div><div class="value">${{ "%.2f"|format(valor_total_inventario) }}</div></div>
+          <div class="kpi"><div class="label">Bajo stock (&lt; {{ umbral_bajo_stock }})</div><div class="value {{ 'warn' if bajo_stock > 0 }}">{{ bajo_stock }}</div></div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th></th></tr></thead>
+            <tbody>
+              {% for p in productos %}
+              <tr>
+                <td class="codigo">{{ p.codigo }}</td>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.categoria }}</td>
+                <td class="num">${{ "%.2f"|format(p.precio) }}</td>
+                <td class="num"><span class="stock-chip {{ 'stock-low' if p.cantidad < umbral_bajo_stock else 'stock-ok' }}">{{ "%04d"|format(p.cantidad) }}</span></td>
+                <td>
+                  <div class="row-actions">
+                    <a class="icon-btn" href="{{ url_for('index', view='consultar', codigo=p.codigo) }}">Consultar</a>
+                    <a class="icon-btn" href="{{ url_for('index', view='stock', codigo=p.codigo) }}">Stock</a>
+                    <a class="icon-btn" href="{{ url_for('calcular_valor', codigo=p.codigo) }}">Valor</a>
+                    <form method="post" action="{{ url_for('eliminar') }}" class="inline-form"
+                          onsubmit="return confirm('¿Eliminar {{ p.codigo }}? Esta acción no se puede deshacer.');">
+                      <input type="hidden" name="codigo" value="{{ p.codigo }}">
+                      <input type="hidden" name="next" value="listar">
+                      <button class="icon-btn icon-btn-danger" type="submit">Eliminar</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr><td colspan="6" class="vacio">No hay productos registrados todavía.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 04 STOCK ============ -->
+      <section class="view {{ 'active' if vista == 'stock' }}">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Operación 4 / 6 · ActualizarStock</span>
+            <h1 class="page-title">Actualizar stock</h1>
+            <p class="page-desc">Cambia la cantidad disponible de un producto existente.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+        </div>
+
+        <div class="card" style="max-width:26rem;">
+          <h3>Nueva cantidad <span class="tag">entrada</span></h3>
+          <form method="post" action="{{ url_for('actualizar_stock') }}">
+            <input type="hidden" name="next" value="stock">
+            <div class="field"><label for="s-codigo">Código</label><input id="s-codigo" name="codigo" value="{{ codigo_prefill }}" placeholder="P101" required></div>
+            <div class="field"><label for="s-cantidad">Nueva cantidad</label><input id="s-cantidad" name="cantidad" type="number" min="0" placeholder="20" required></div>
+            <button class="btn btn-primary" type="submit">Actualizar stock</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ============ 05 VALOR ============ -->
+      <section class="view {{ 'active' if vista == 'valor' }}">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Operación 5 / 6 · CalcularValorInventario</span>
+            <h1 class="page-title">Calcular valor de inventario</h1>
+            <p class="page-desc">Multiplica precio × cantidad disponible para un producto.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>Producto <span class="tag">entrada</span></h3>
+            <form method="get" action="{{ url_for('calcular_valor') }}">
+              <div class="field"><label for="v-codigo">Código</label><input id="v-codigo" name="codigo" value="{{ codigo_prefill }}" placeholder="P201" required></div>
+              <button class="btn btn-primary" type="submit">Calcular</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>Resultado <span class="tag">salida</span></h3>
+            {% if resultado_valor %}
+              <div class="stat-tile">
+                <span class="label">Valor total del inventario — {{ resultado_valor.codigo }}</span>
+                <span class="amount">${{ "%.2f"|format(resultado_valor.valorTotal|float) }}</span>
+                <span class="formula">${{ "%.2f"|format(resultado_valor.precio|float) }} × {{ resultado_valor.cantidad }} unidades ({{ resultado_valor.nombre }})</span>
+              </div>
+            {% else %}
+              <p class="vacio-nota">Todavía no has calculado el valor de ningún producto en esta sesión.</p>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 06 ELIMINAR ============ -->
+      <section class="view {{ 'active' if vista == 'eliminar' }}">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Operación 6 / 6 · EliminarProducto</span>
+            <h1 class="page-title">Eliminar producto</h1>
+            <p class="page-desc">Quita un producto del inventario de forma permanente.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+        </div>
+
+        <div class="card" style="max-width:26rem;">
+          <h3>Producto a eliminar <span class="tag">entrada</span></h3>
+          <form method="post" action="{{ url_for('eliminar') }}"
+                onsubmit="return confirm('¿Eliminar este producto? Esta acción no se puede deshacer.');">
+            <input type="hidden" name="next" value="eliminar">
+            <div class="field"><label for="e-codigo">Código</label><input id="e-codigo" name="codigo" placeholder="P200" required></div>
+            <div class="danger-box">
+              <h4>Esta acción no se puede deshacer</h4>
+              <p>El producto se borra de la memoria del servidor y, si Supabase está conectado, también de la tabla persistida.</p>
+            </div>
+            <button class="btn btn-danger" type="submit">Eliminar producto</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
