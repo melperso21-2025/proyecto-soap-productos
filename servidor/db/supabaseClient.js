@@ -49,10 +49,32 @@ async function eliminarProducto(codigo) {
   }
 }
 
+// Respaldo si Supabase no esta configurado, para que /api/equipo nunca
+// dependa de un servicio externo (mismo criterio que el resto del servidor).
+const INTEGRANTES_RESPALDO = [
+  { nombre: "Ismael", rol: "Servidor SOAP, API REST y front PHP" },
+  { nombre: "Alexandra", rol: "Validaciones y pruebas SoapUI" },
+  { nombre: "Israel", rol: "Cliente y front Python" },
+];
+
+async function listarIntegrantes() {
+  if (!habilitado) return INTEGRANTES_RESPALDO;
+  const { data, error } = await supabase
+    .from("integrantes")
+    .select("nombre, rol")
+    .order("orden", { ascending: true });
+  if (error) {
+    console.warn("⚠ No se pudo cargar el equipo desde Supabase:", error.message);
+    return INTEGRANTES_RESPALDO;
+  }
+  return data;
+}
+
 module.exports = {
   habilitado,
   cargarProductos,
   insertarProducto,
   actualizarStock,
   eliminarProducto,
+  listarIntegrantes,
 };
