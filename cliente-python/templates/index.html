@@ -53,7 +53,7 @@
       </div>
 
       <div class="sidebar-footer">
-        Bonus opcional · no exigido por el PDF de la tarea
+        <span class="instancia-pill"><span class="status-dot"></span>Servidor: {{ instancia }}</span>
         <div class="team">
           {% if equipo %}
             {% for integrante in equipo %}
@@ -159,7 +159,7 @@
 
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th></th></tr></thead>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th>Origen</th><th></th></tr></thead>
             <tbody>
               {% for p in productos %}
               <tr>
@@ -168,6 +168,7 @@
                 <td>{{ p.categoria }}</td>
                 <td class="num">${{ "%.2f"|format(p.precio) }}</td>
                 <td class="num"><span class="stock-chip {{ 'stock-low' if p.cantidad < umbral_bajo_stock else 'stock-ok' }}">{{ "%04d"|format(p.cantidad) }}</span></td>
+                <td><span class="origen-chip">{{ origenes.get(p.codigo, "—") }}</span></td>
                 <td>
                   <div class="row-actions">
                     <a class="icon-btn" href="{{ url_for('index', view='consultar', codigo=p.codigo) }}">Consultar</a>
@@ -183,7 +184,7 @@
                 </td>
               </tr>
               {% else %}
-              <tr><td colspan="6" class="vacio">No hay productos registrados todavía.</td></tr>
+              <tr><td colspan="7" class="vacio">No hay productos registrados todavía.</td></tr>
               {% endfor %}
             </tbody>
           </table>

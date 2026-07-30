@@ -28,7 +28,19 @@ const service = {
       },
 
       ListarProductos: (_args, callback) => {
-        callback(operaciones.listarProductos());
+        // node-soap serializa cualquier propiedad presente en el objeto,
+        // aunque no este declarada en el WSDL. "origen" es metadata solo
+        // para la API REST (ver rest.js) - aqui se filtra explicitamente
+        // para no romper el contrato SOAP con un elemento no declarado.
+        const { productos: lista } = operaciones.listarProductos();
+        const productosSoap = lista.map(({ codigo, nombre, categoria, precio, cantidad }) => ({
+          codigo,
+          nombre,
+          categoria,
+          precio,
+          cantidad,
+        }));
+        callback({ productos: productosSoap });
       },
 
       ActualizarStock: (args, callback) => {

@@ -2,9 +2,15 @@
 // (server.js) y la API REST (rest.js). Evita duplicar validaciones y
 // mensajes de error entre los dos protocolos que exponen lo mismo.
 
+const os = require("os");
 const productos = require("./data/productos");
 const supabaseClient = require("./db/supabaseClient");
 const { validarRegistro, validarCodigo, validarNuevaCantidad } = require("./validaciones");
+
+// Los 3 integrantes corren su propia instancia local del servidor, todas
+// apuntando al mismo Supabase. Este nombre marca qué instancia registro
+// cada producto (columna "origen") y se expone en GET /api/instancia.
+const NOMBRE_INSTANCIA = process.env.NOMBRE_INSTANCIA || os.hostname();
 
 function log(operacion, detalle) {
   const hora = new Date().toLocaleTimeString();
@@ -30,6 +36,7 @@ async function registrarProducto(datos) {
     categoria: String(datos.categoria).trim(),
     precio: Number(datos.precio),
     cantidad: Number(datos.cantidad),
+    origen: NOMBRE_INSTANCIA,
   };
 
   productos.agregar(nuevoProducto);
@@ -154,4 +161,5 @@ module.exports = {
   actualizarStock,
   calcularValorInventario,
   eliminarProducto,
+  NOMBRE_INSTANCIA,
 };

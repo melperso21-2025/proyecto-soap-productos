@@ -111,9 +111,14 @@ a{color:inherit;}
 
 .sidebar-footer{
   margin-top:auto; padding-top:1rem; border-top:1px solid var(--sidebar-line);
-  font-family:var(--font-mono); font-size:0.68rem; color:var(--sidebar-ink); opacity:0.75;
+  font-family:var(--font-mono); font-size:0.68rem; color:var(--sidebar-ink);
 }
-.sidebar-footer .team{margin-top:0.5rem; display:flex; flex-direction:column; gap:0.4rem;}
+.instancia-pill{
+  display:inline-flex; align-items:center; gap:0.4rem; padding:0.3rem 0.6rem;
+  border-radius:99px; background:var(--sidebar-bg-2); border:1px solid var(--sidebar-line);
+  color:var(--sidebar-ink-active); font-size:0.68rem;
+}
+.sidebar-footer .team{margin-top:0.7rem; display:flex; flex-direction:column; gap:0.4rem; opacity:0.85;}
 .team-row{display:flex; flex-direction:column;}
 .team-nombre{color:var(--sidebar-ink-active); font-size:0.72rem;}
 .team-rol{opacity:0.75; font-size:0.64rem;}
@@ -209,6 +214,7 @@ td.num{text-align:right;}
 .stock-chip{display:inline-flex; padding:0.15rem 0.5rem; border-radius:99px; font-family:var(--font-mono); font-size:0.72rem;}
 .stock-ok{background:var(--accent-soft); color:var(--accent-ink);}
 .stock-low{background:var(--warn-soft); color:var(--warn);}
+.origen-chip{font-family:var(--font-mono); font-size:0.72rem; color:var(--ink-muted);}
 .row-actions{display:flex; gap:0.35rem; justify-content:flex-end; align-items:center; flex-wrap:wrap;}
 .inline-form{display:inline-flex; margin:0;}
 .icon-btn{

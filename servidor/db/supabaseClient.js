@@ -14,7 +14,7 @@ async function cargarProductos() {
   if (!habilitado) return [];
   const { data, error } = await supabase
     .from("productos")
-    .select("codigo, nombre, categoria, precio, cantidad");
+    .select("codigo, nombre, categoria, precio, cantidad, origen");
   if (error) {
     console.warn("⚠ No se pudo cargar productos desde Supabase:", error.message);
     return [];

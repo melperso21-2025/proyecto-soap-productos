@@ -18,6 +18,8 @@ session_start();
 
 const WSDL_URL = "http://localhost:8000/productos?wsdl";
 const API_EQUIPO_URL = "http://localhost:8000/api/equipo";
+const API_INSTANCIA_URL = "http://localhost:8000/api/instancia";
+const API_PRODUCTOS_URL = "http://localhost:8000/api/productos";
 const VISTAS = ["registrar", "consultar", "listar", "stock", "valor", "eliminar"];
 const UMBRAL_BAJO_STOCK = 5;
 
@@ -46,17 +48,38 @@ function irA(string $vista, array $query = []): void {
     exit;
 }
 
-function obtenerEquipo(): array {
-    $ch = curl_init(API_EQUIPO_URL);
+function obtenerJson(string $url) {
+    $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 3);
     $respuesta = curl_exec($ch);
     curl_close($ch);
     if ($respuesta === false) {
-        return [];
+        return null;
     }
-    $datos = json_decode($respuesta, true);
+    return json_decode($respuesta, true);
+}
+
+function obtenerEquipo(): array {
+    $datos = obtenerJson(API_EQUIPO_URL);
     return is_array($datos) ? $datos : [];
+}
+
+function obtenerInstancia(): string {
+    $datos = obtenerJson(API_INSTANCIA_URL);
+    return is_array($datos) && isset($datos["nombre"]) ? $datos["nombre"] : "desconocido";
+}
+
+function obtenerOrigenes(): array {
+    // El WSDL no expone "origen" (no esta en el contrato SOAP obligatorio),
+    // asi que se completa aparte consultando la API REST del mismo servidor.
+    $datos = obtenerJson(API_PRODUCTOS_URL);
+    $lista = $datos["productos"] ?? [];
+    $mapa = [];
+    foreach ((is_array($lista) ? $lista : []) as $p) {
+        $mapa[$p["codigo"]] = $p["origen"] ?? null;
+    }
+    return $mapa;
 }
 
 // ============================================================
@@ -209,6 +232,8 @@ if ($vista === "valor" && isset($_GET["valorTotal"])) {
 }
 
 $equipo = obtenerEquipo();
+$instancia = obtenerInstancia();
+$origenes = obtenerOrigenes();
 
 $mensajes = $_SESSION["flash"] ?? [];
 unset($_SESSION["flash"]);
@@ -268,7 +293,7 @@ unset($_SESSION["flash"]);
       </div>
 
       <div class="sidebar-footer">
-        Bonus opcional · no exigido por el PDF de la tarea
+        <span class="instancia-pill"><span class="status-dot"></span>Servidor: <?= e($instancia) ?></span>
         <div class="team">
           <?php if ($equipo): ?>
             <?php foreach ($equipo as $integrante): ?>
@@ -370,10 +395,10 @@ unset($_SESSION["flash"]);
 
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th></th></tr></thead>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th>Origen</th><th></th></tr></thead>
             <tbody>
               <?php if (!$productos): ?>
-                <tr><td colspan="6" class="vacio">No hay productos registrados todavía.</td></tr>
+                <tr><td colspan="7" class="vacio">No hay productos registrados todavía.</td></tr>
               <?php endif; ?>
               <?php foreach ($productos as $p): ?>
                 <tr>
@@ -382,6 +407,7 @@ unset($_SESSION["flash"]);
                   <td><?= e($p->categoria) ?></td>
                   <td class="num">$<?= e(number_format($p->precio, 2)) ?></td>
                   <td class="num"><span class="stock-chip <?= $p->cantidad < UMBRAL_BAJO_STOCK ? "stock-low" : "stock-ok" ?>"><?= e(str_pad((string) $p->cantidad, 4, "0", STR_PAD_LEFT)) ?></span></td>
+                  <td><span class="origen-chip"><?= e($origenes[$p->codigo] ?? "—") ?></span></td>
                   <td>
                     <div class="row-actions">
                       <a class="icon-btn" href="index.php?view=consultar&codigo=<?= urlencode($p->codigo) ?>">Consultar</a>

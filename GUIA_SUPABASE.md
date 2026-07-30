@@ -34,6 +34,22 @@ dashboard, ver tablas, datos y logs.
    de respaldo fija en el código — no bloquea nada, pero conviene tener la
    tabla real para que la defensa muestre datos "de verdad" desde Supabase.
 
+## 2c. Agregar la columna `origen` (para saber de qué instancia vino cada producto)
+
+Como los 3 corren su propio servidor local apuntando a esta misma base, esta
+columna identifica quién registró cada producto (ver `NOMBRE_INSTANCIA` en el
+`.env`, sección 3b).
+
+1. **SQL Editor** → **New query** de nuevo.
+2. Pega el contenido de
+   [`servidor/db/schema_origen.sql`](servidor/db/schema_origen.sql) y
+   presiona **Run**.
+3. **Importante:** si no ejecutas esto, el servidor sigue arrancando bien
+   (no se rompe nada — es el mismo principio de "nunca depender de un
+   servicio externo"), pero al hidratar la memoria vas a ver una advertencia
+   `column productos.origen does not exist` en la consola y los productos ya
+   guardados no se van a recargar hasta que corras esta migración.
+
 ## 3. Obtener las credenciales para el `.env`
 
 1. **Project Settings** (ícono de engranaje) → **Data API**.
@@ -46,6 +62,14 @@ dashboard, ver tablas, datos y logs.
 ```bash
 cp servidor/.env.example servidor/.env
 ```
+
+### 3b. `NOMBRE_INSTANCIA` — quién eres tú
+
+En ese mismo `.env`, cambia `NOMBRE_INSTANCIA` por tu propio nombre
+(Alexandra o Israel). Esto es lo que hace que, aunque los 3 apunten a la
+misma base de Supabase, se pueda saber en la columna "Origen" (en el
+listado de productos de ambos fronts) y en el pill "Servidor: ..." de la
+barra lateral, cuál instancia local generó cada dato.
 
 > La `anon key` es pública por diseño (se usa desde el navegador en apps reales);
 > lo que protege los datos es la política RLS. Para este proyecto académico se

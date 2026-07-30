@@ -21,6 +21,8 @@ from zeep.exceptions import Fault, TransportError
 
 WSDL_URL = "http://localhost:8000/productos?wsdl"
 API_EQUIPO_URL = "http://localhost:8000/api/equipo"
+API_INSTANCIA_URL = "http://localhost:8000/api/instancia"
+API_PRODUCTOS_URL = "http://localhost:8000/api/productos"
 VISTAS = ("registrar", "consultar", "listar", "stock", "valor", "eliminar")
 UMBRAL_BAJO_STOCK = 5
 
@@ -50,6 +52,31 @@ def obtener_equipo():
         return respuesta.json()
     except requests.RequestException:
         return []
+
+
+def obtener_origenes():
+    """Mapa codigo -> origen (que instancia local registro el producto).
+    El WSDL no expone este campo (no esta en el contrato SOAP obligatorio),
+    asi que se completa aparte consultando la API REST del mismo servidor."""
+    try:
+        respuesta = requests.get(API_PRODUCTOS_URL, timeout=3)
+        respuesta.raise_for_status()
+        datos = respuesta.json().get("productos", [])
+        return {p["codigo"]: p.get("origen") for p in datos}
+    except requests.RequestException:
+        return {}
+
+
+def obtener_instancia():
+    """De que maquina viene el servidor al que este front esta conectado.
+    Los 3 integrantes corren su propio server.js apuntando al mismo Supabase,
+    asi que esto evita confundir el origen de los datos que se ven aqui."""
+    try:
+        respuesta = requests.get(API_INSTANCIA_URL, timeout=3)
+        respuesta.raise_for_status()
+        return respuesta.json().get("nombre", "desconocido")
+    except requests.RequestException:
+        return "desconocido"
 
 
 @app.route("/")
@@ -105,6 +132,8 @@ def index():
         resultado_consulta=resultado_consulta,
         resultado_valor=resultado_valor,
         equipo=obtener_equipo(),
+        instancia=obtener_instancia(),
+        origenes=obtener_origenes(),
     )
 
 

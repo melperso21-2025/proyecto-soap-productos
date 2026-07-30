@@ -1,50 +1,53 @@
+/* Paleta propia del front PHP: mismo sistema de diseño que Python, pero con
+   un acento índigo/violeta (en vez del verde de Python) para poder
+   distinguir a simple vista qué front estás mirando. */
 :root{
-  --bg:#F3F4EF;
+  --bg:#F2F2F7;
   --surface:#FFFFFF;
-  --surface-2:#F8F9F5;
-  --ink:#1E2622;
-  --ink-muted:#5B665F;
-  --line:#DADFD8;
-  --line-strong:#BFC7BC;
-  --accent:#2F6F5E;
-  --accent-soft:#E4EEE9;
-  --accent-ink:#173A31;
+  --surface-2:#F7F7FB;
+  --ink:#20212E;
+  --ink-muted:#5C5F72;
+  --line:#D8D9E4;
+  --line-strong:#BCBECF;
+  --accent:#4C56A6;
+  --accent-soft:#E7E8F6;
+  --accent-ink:#2B3170;
   --warn:#B5651D;
   --warn-soft:#F7E9DA;
   --danger:#A13F3F;
   --danger-soft:#F5E4E2;
-  --sidebar-bg:#16211D;
-  --sidebar-bg-2:#1C2B25;
-  --sidebar-ink:#AEBDB3;
+  --sidebar-bg:#191B2B;
+  --sidebar-bg-2:#212440;
+  --sidebar-ink:#AEB0C9;
   --sidebar-ink-active:#FFFFFF;
-  --sidebar-line:#28382F;
-  --sidebar-accent:#6FBC9E;
+  --sidebar-line:#2C2F4A;
+  --sidebar-accent:#9AA3F0;
   --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
   --font-body: -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#12140F;
-    --surface:#181B15;
-    --surface-2:#1F231C;
-    --ink:#E9ECE7;
-    --ink-muted:#9AA69C;
-    --line:#2B322D;
-    --line-strong:#3A433C;
-    --accent:#5FA98D;
-    --accent-soft:#1E2C27;
-    --accent-ink:#BFE7D8;
+    --bg:#100F16;
+    --surface:#17161F;
+    --surface-2:#1D1C28;
+    --ink:#E9E9F0;
+    --ink-muted:#9C9DB0;
+    --line:#2C2B3A;
+    --line-strong:#3B3A4D;
+    --accent:#9AA3F0;
+    --accent-soft:#242850;
+    --accent-ink:#D3D6FA;
     --warn:#D98A4A;
     --warn-soft:#2E2115;
     --danger:#D97575;
     --danger-soft:#2E1E1D;
-    --sidebar-bg:#0D1310;
-    --sidebar-bg-2:#111A15;
-    --sidebar-ink:#8A968E;
+    --sidebar-bg:#0D0C13;
+    --sidebar-bg-2:#151420;
+    --sidebar-ink:#8E8FA6;
     --sidebar-ink-active:#FFFFFF;
-    --sidebar-line:#1D2620;
-    --sidebar-accent:#6FBC9E;
+    --sidebar-line:#201F2E;
+    --sidebar-accent:#9AA3F0;
   }
 }
 
@@ -111,9 +114,14 @@ a{color:inherit;}
 
 .sidebar-footer{
   margin-top:auto; padding-top:1rem; border-top:1px solid var(--sidebar-line);
-  font-family:var(--font-mono); font-size:0.68rem; color:var(--sidebar-ink); opacity:0.75;
+  font-family:var(--font-mono); font-size:0.68rem; color:var(--sidebar-ink);
 }
-.sidebar-footer .team{margin-top:0.5rem; display:flex; flex-direction:column; gap:0.4rem;}
+.instancia-pill{
+  display:inline-flex; align-items:center; gap:0.4rem; padding:0.3rem 0.6rem;
+  border-radius:99px; background:var(--sidebar-bg-2); border:1px solid var(--sidebar-line);
+  color:var(--sidebar-ink-active); font-size:0.68rem;
+}
+.sidebar-footer .team{margin-top:0.7rem; display:flex; flex-direction:column; gap:0.4rem; opacity:0.85;}
 .team-row{display:flex; flex-direction:column;}
 .team-nombre{color:var(--sidebar-ink-active); font-size:0.72rem;}
 .team-rol{opacity:0.75; font-size:0.64rem;}
@@ -209,6 +217,7 @@ td.num{text-align:right;}
 .stock-chip{display:inline-flex; padding:0.15rem 0.5rem; border-radius:99px; font-family:var(--font-mono); font-size:0.72rem;}
 .stock-ok{background:var(--accent-soft); color:var(--accent-ink);}
 .stock-low{background:var(--warn-soft); color:var(--warn);}
+.origen-chip{font-family:var(--font-mono); font-size:0.72rem; color:var(--ink-muted);}
 .row-actions{display:flex; gap:0.35rem; justify-content:flex-end; align-items:center; flex-wrap:wrap;}
 .inline-form{display:inline-flex; margin:0;}
 .icon-btn{

@@ -37,6 +37,12 @@ function montarApiRest(app) {
     const integrantes = await supabaseClient.listarIntegrantes();
     res.json(integrantes);
   });
+
+  // Identifica QUE instancia local esta respondiendo (los 3 integrantes
+  // corren su propio servidor apuntando al mismo Supabase compartido).
+  app.get("/api/instancia", (_req, res) => {
+    res.json({ nombre: operaciones.NOMBRE_INSTANCIA });
+  });
 }
 
 module.exports = { montarApiRest };
