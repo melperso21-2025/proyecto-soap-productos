@@ -9,6 +9,31 @@ const supabaseClient = require("./db/supabaseClient");
 function montarApiRest(app) {
   app.use(express.json());
 
+  // La raiz "/" no tiene contenido propio (este servidor solo expone SOAP
+  // y REST) - se deja una pagina informativa para no ver "Cannot GET /".
+  app.get("/", (_req, res) => {
+    res.json({
+      servicio: "Servidor SOAP + REST de productos",
+      instancia: operaciones.NOMBRE_INSTANCIA,
+      wsdl: "/productos?wsdl",
+      soap: "/productos",
+      rest: {
+        listar: "GET /api/productos",
+        consultar: "GET /api/productos/:codigo",
+        registrar: "POST /api/productos",
+        actualizarStock: "PATCH /api/productos/:codigo/stock",
+        calcularValor: "GET /api/productos/:codigo/valor",
+        eliminar: "DELETE /api/productos/:codigo",
+        equipo: "GET /api/equipo",
+        instancia: "GET /api/instancia",
+      },
+      fronts: {
+        python: "http://127.0.0.1:5000",
+        php: "http://localhost:5001",
+      },
+    });
+  });
+
   app.get("/api/productos", (_req, res) => {
     res.json(operaciones.listarProductos());
   });
