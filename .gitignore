@@ -10,3 +10,7 @@ __pycache__/
 .venv/
 venv/
 instance/
+
+# .NET (cliente-csharp/)
+bin/
+obj/

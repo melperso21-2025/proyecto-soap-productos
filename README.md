@@ -25,6 +25,7 @@ proyecto-soap-productos/
 ├── cliente-php/
 │   ├── client.php       Cliente de consola (SoapClient nativo)
 │   └── front/           Front web en PHP puro                — Ismael (puerto 5001)
+├── cliente-csharp/      Cliente C# (.NET, dotnet-svcutil)      — Alexandra
 ├── evidencias/           Capturas: servidor, clientes, SoapUI
 ├── informe/              Informe técnico en PDF
 ├── GUIA_SUPABASE.md      Cómo crear el proyecto y dar acceso al equipo
@@ -75,12 +76,26 @@ demostrando en un mismo front el uso de los dos protocolos.
 ```bash
 cd cliente-python && python client.py
 cd cliente-php && php client.php
+cd cliente-csharp && dotnet run
 ```
 
 Todos demuestran las 7 pruebas mínimas que pide el enunciado: registro de 2
 productos, consulta existente/inexistente, listado, actualización de stock,
 cálculo de valor de inventario y eliminación (incluyendo un caso incorrecto
 de cada operación clave).
+
+El cliente C# usa un proxy generado con `dotnet-svcutil` (herramienta local
+del repo, ver `dotnet-tools.json`) a partir del WSDL — mismo rol que `zeep`
+en Python o `SoapClient` en PHP. Si necesitas regenerarlo (por ejemplo,
+después de un cambio en `productos.wsdl`):
+
+```bash
+cd cliente-csharp
+dotnet tool restore
+dotnet tool run dotnet-svcutil "http://localhost:8000/productos?wsdl" \
+  --outputFile ProductosServiceReference.cs \
+  --namespace "*,ClienteSoap.ProductosService"
+```
 
 ## Las 6 operaciones del servicio (SOAP y REST)
 
