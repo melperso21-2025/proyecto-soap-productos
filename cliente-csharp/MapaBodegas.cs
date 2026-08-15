@@ -21,6 +21,8 @@ public static class MapaBodegas
     {
         ["Perifericos"] = new Bodega("Bodega Quito Norte", "Uio", -0.1807, -78.4678),
         ["Computadoras"] = new Bodega("Bodega Quito Norte", "Uio", -0.1807, -78.4678),
+        ["Laptop"] = new Bodega("Bodega Quito Norte", "Uio", -0.1807, -78.4678),
+        ["Laptops"] = new Bodega("Bodega Quito Norte", "Uio", -0.1807, -78.4678),
         ["Pantallas"] = new Bodega("Bodega Guayaquil", "Gye", -2.1894, -79.8891),
         ["Monitores"] = new Bodega("Bodega Guayaquil", "Gye", -2.1894, -79.8891),
         ["Mobiliario"] = new Bodega("Bodega Cuenca", "Cue", -2.9001, -79.0059),

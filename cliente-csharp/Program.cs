@@ -15,6 +15,12 @@
 // rol que zeep en el cliente Python o SoapClient en el cliente PHP: lee el
 // WSDL y crea las clases necesarias para invocar las 6 operaciones sin
 // construir el XML del sobre SOAP a mano.
+//
+// Uso:
+//   dotnet run              -> corre las 7 demostraciones completas
+//   dotnet run -- --mapa    -> solo lista lo que haya ahora mismo (ej. lo
+//                              que se registro desde SoapUI) y regenera/abre
+//                              el mapa, sin registrar ni borrar nada
 
 using System.Reflection;
 using System.ServiceModel;
@@ -58,55 +64,73 @@ void Mostrar(object respuesta)
     }
 }
 
-var cliente = new ProductosPortTypeClient();
-
-try
+void GenerarYAbrirMapa(Producto[] productos)
 {
-    Separador("1. Registrar dos productos");
-    Mostrar(await cliente.RegistrarProductoAsync(new RegistrarProductoRequest(
-        "P300", "Teclado mecanico", "Perifericos", 89.99m, 10)));
-    Mostrar(await cliente.RegistrarProductoAsync(new RegistrarProductoRequest(
-        "P301", "Mouse gamer", "Perifericos", 45.00m, 20)));
-
-    Separador("1b. Caso incorrecto: codigo duplicado");
-    Mostrar(await cliente.RegistrarProductoAsync(new RegistrarProductoRequest(
-        "P300", "Teclado mecanico", "Perifericos", 89.99m, 10)));
-
-    Separador("2. Consultar producto existente (P300)");
-    Mostrar(await cliente.ConsultarProductoAsync(new ConsultarProductoRequest("P300")));
-
-    Separador("3. Consultar producto inexistente (P999)");
-    Mostrar(await cliente.ConsultarProductoAsync(new ConsultarProductoRequest("P999")));
-
-    Separador("4. Listar productos");
-    var listado = await cliente.ListarProductosAsync();
-    Mostrar(listado);
-
-    Separador("4b. Generar mapa de bodegas (Leaflet)");
-    string rutaMapa = Path.Combine(AppContext.BaseDirectory, "mapa_productos.html");
-    string? mapaGenerado = MapaBodegas.Generar(listado.productos, rutaMapa);
-    if (mapaGenerado is not null)
+    string ruta = Path.Combine(AppContext.BaseDirectory, "mapa_productos.html");
+    string? generado = MapaBodegas.Generar(productos, ruta);
+    if (generado is not null)
     {
-        Console.WriteLine($"Mapa generado: {mapaGenerado}");
+        Console.WriteLine($"Mapa generado: {generado}");
         Console.WriteLine("Cada categoría se ubica en una bodega/tienda distinta (Quito, Guayaquil, Cuenca, Ambato).");
-        MapaBodegas.AbrirEnNavegador(mapaGenerado);
+        MapaBodegas.AbrirEnNavegador(generado);
     }
     else
     {
         Console.WriteLine("No hay productos registrados todavía, no se generó el mapa.");
     }
+}
 
-    Separador("5. Actualizar stock de P301 a 30 unidades");
-    Mostrar(await cliente.ActualizarStockAsync(new ActualizarStockRequest("P301", 30)));
+var cliente = new ProductosPortTypeClient();
 
-    Separador("6. Calcular valor del inventario de P301");
-    Mostrar(await cliente.CalcularValorInventarioAsync(new CalcularValorInventarioRequest("P301")));
+try
+{
+    if (args.Contains("--mapa"))
+    {
+        // Modo liviano: no registra ni borra nada, solo toma lo que ya
+        // este guardado (por ejemplo, productos registrados desde SoapUI)
+        // y regenera el mapa con el estado actual.
+        Separador("Actualizar mapa con los productos actuales");
+        var listadoActual = await cliente.ListarProductosAsync();
+        Mostrar(listadoActual);
+        GenerarYAbrirMapa(listadoActual.productos);
+    }
+    else
+    {
+        Separador("1. Registrar dos productos");
+        Mostrar(await cliente.RegistrarProductoAsync(new RegistrarProductoRequest(
+            "P300", "Teclado mecanico", "Perifericos", 89.99m, 10)));
+        Mostrar(await cliente.RegistrarProductoAsync(new RegistrarProductoRequest(
+            "P301", "Mouse gamer", "Perifericos", 45.00m, 20)));
 
-    Separador("7. Eliminar producto P300");
-    Mostrar(await cliente.EliminarProductoAsync(new EliminarProductoRequest("P300")));
+        Separador("1b. Caso incorrecto: codigo duplicado");
+        Mostrar(await cliente.RegistrarProductoAsync(new RegistrarProductoRequest(
+            "P300", "Teclado mecanico", "Perifericos", 89.99m, 10)));
 
-    Separador("7b. Caso incorrecto: eliminar producto ya eliminado");
-    Mostrar(await cliente.EliminarProductoAsync(new EliminarProductoRequest("P300")));
+        Separador("2. Consultar producto existente (P300)");
+        Mostrar(await cliente.ConsultarProductoAsync(new ConsultarProductoRequest("P300")));
+
+        Separador("3. Consultar producto inexistente (P999)");
+        Mostrar(await cliente.ConsultarProductoAsync(new ConsultarProductoRequest("P999")));
+
+        Separador("4. Listar productos");
+        var listado = await cliente.ListarProductosAsync();
+        Mostrar(listado);
+
+        Separador("4b. Generar mapa de bodegas (Leaflet)");
+        GenerarYAbrirMapa(listado.productos);
+
+        Separador("5. Actualizar stock de P301 a 30 unidades");
+        Mostrar(await cliente.ActualizarStockAsync(new ActualizarStockRequest("P301", 30)));
+
+        Separador("6. Calcular valor del inventario de P301");
+        Mostrar(await cliente.CalcularValorInventarioAsync(new CalcularValorInventarioRequest("P301")));
+
+        Separador("7. Eliminar producto P300");
+        Mostrar(await cliente.EliminarProductoAsync(new EliminarProductoRequest("P300")));
+
+        Separador("7b. Caso incorrecto: eliminar producto ya eliminado");
+        Mostrar(await cliente.EliminarProductoAsync(new EliminarProductoRequest("P300")));
+    }
 }
 catch (EndpointNotFoundException error)
 {
