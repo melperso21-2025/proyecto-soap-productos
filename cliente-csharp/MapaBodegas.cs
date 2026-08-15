@@ -11,7 +11,7 @@ using ClienteSoap.ProductosService;
 
 namespace ClienteSoap;
 
-public record Bodega(string Nombre, double Lat, double Lng);
+public record Bodega(string Nombre, string Localizacion, double Lat, double Lng);
 
 public static class MapaBodegas
 {
@@ -19,17 +19,31 @@ public static class MapaBodegas
     // categoria que no este en este diccionario cae en BodegaPorDefecto.
     private static readonly Dictionary<string, Bodega> BodegaPorCategoria = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["Perifericos"] = new Bodega("Bodega Quito Norte", -0.1807, -78.4678),
-        ["Computadoras"] = new Bodega("Bodega Quito Norte", -0.1807, -78.4678),
-        ["Pantallas"] = new Bodega("Bodega Guayaquil", -2.1894, -79.8891),
-        ["Monitores"] = new Bodega("Bodega Guayaquil", -2.1894, -79.8891),
-        ["Mobiliario"] = new Bodega("Bodega Cuenca", -2.9001, -79.0059),
+        ["Perifericos"] = new Bodega("Bodega Quito Norte", "Uio", -0.1807, -78.4678),
+        ["Computadoras"] = new Bodega("Bodega Quito Norte", "Uio", -0.1807, -78.4678),
+        ["Pantallas"] = new Bodega("Bodega Guayaquil", "Gye", -2.1894, -79.8891),
+        ["Monitores"] = new Bodega("Bodega Guayaquil", "Gye", -2.1894, -79.8891),
+        ["Mobiliario"] = new Bodega("Bodega Cuenca", "Cue", -2.9001, -79.0059),
     };
 
-    private static readonly Bodega BodegaPorDefecto = new("Centro de Distribución Ambato", -1.2543, -78.6229);
+    private static readonly Bodega BodegaPorDefecto = new("Centro de Distribución Ambato", "Amb", -1.2543, -78.6229);
 
-    private static Bodega ResolverBodega(string categoria) =>
-        BodegaPorCategoria.TryGetValue(categoria, out var bodega) ? bodega : BodegaPorDefecto;
+    // Casos puntuales por codigo de producto, tienen prioridad sobre la
+    // categoria (ej. para separar dos productos de la misma categoria en
+    // bodegas distintas en la demo).
+    private static readonly Dictionary<string, Bodega> BodegaPorCodigoProducto = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["P300"] = new Bodega("Bodega Guayaquil Centro", "Gye", -2.1710, -79.9224),
+    };
+
+    private static Bodega ResolverBodega(Producto producto)
+    {
+        if (BodegaPorCodigoProducto.TryGetValue(producto.codigo, out var porCodigo))
+        {
+            return porCodigo;
+        }
+        return BodegaPorCategoria.TryGetValue(producto.categoria, out var porCategoria) ? porCategoria : BodegaPorDefecto;
+    }
 
     // Devuelve la ruta del HTML generado, o null si no habia productos.
     public static string? Generar(Producto[] productos, string rutaSalida)
@@ -40,11 +54,12 @@ public static class MapaBodegas
         }
 
         var grupos = productos
-            .Select(p => new { Producto = p, Bodega = ResolverBodega(p.categoria) })
+            .Select(p => new { Producto = p, Bodega = ResolverBodega(p) })
             .GroupBy(x => x.Bodega)
             .Select(g => new
             {
                 nombre = g.Key.Nombre,
+                localizacion = g.Key.Localizacion,
                 lat = g.Key.Lat,
                 lng = g.Key.Lng,
                 productos = g.Select(x => new
@@ -59,14 +74,19 @@ public static class MapaBodegas
             .ToArray();
 
         var listado = productos
-            .Select(p => new
+            .Select(p =>
             {
-                p.codigo,
-                p.nombre,
-                p.categoria,
-                p.precio,
-                p.cantidad,
-                ubicacion = ResolverBodega(p.categoria).Nombre,
+                var bodega = ResolverBodega(p);
+                return new
+                {
+                    p.codigo,
+                    p.nombre,
+                    p.categoria,
+                    p.precio,
+                    p.cantidad,
+                    ubicacion = bodega.Nombre,
+                    localizacion = bodega.Localizacion,
+                };
             })
             .ToArray();
 
@@ -113,7 +133,7 @@ public static class MapaBodegas
             <thead>
               <tr>
                 <th>Código</th><th>Nombre</th><th>Categoría</th>
-                <th>Precio</th><th>Cantidad</th><th>Ubicación</th>
+                <th>Precio</th><th>Cantidad</th><th>Ubicación</th><th>Localización</th>
               </tr>
             </thead>
             <tbody id="tabla-productos"></tbody>
@@ -137,7 +157,7 @@ public static class MapaBodegas
               .map(p => `<li>${p.codigo} - ${p.nombre} (x${p.cantidad}, $${p.precio})</li>`)
               .join('');
             L.marker([b.lat, b.lng]).addTo(mapa)
-              .bindPopup(`<b>${b.nombre}</b><br/>${b.productos.length} producto(s):<ul>${items}</ul>`);
+              .bindPopup(`<b>${b.nombre} (${b.localizacion})</b><br/>${b.productos.length} producto(s):<ul>${items}</ul>`);
           });
 
           const cuerpoTabla = document.getElementById('tabla-productos');
@@ -149,6 +169,7 @@ public static class MapaBodegas
               <td>$${p.precio}</td>
               <td>${p.cantidad}</td>
               <td>${p.ubicacion}</td>
+              <td>${p.localizacion}</td>
             </tr>
           `).join('');
         </script>
