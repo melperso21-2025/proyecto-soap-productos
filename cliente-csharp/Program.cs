@@ -18,6 +18,7 @@
 
 using System.Reflection;
 using System.ServiceModel;
+using ClienteSoap;
 using ClienteSoap.ProductosService;
 
 Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -78,7 +79,22 @@ try
     Mostrar(await cliente.ConsultarProductoAsync(new ConsultarProductoRequest("P999")));
 
     Separador("4. Listar productos");
-    Mostrar(await cliente.ListarProductosAsync());
+    var listado = await cliente.ListarProductosAsync();
+    Mostrar(listado);
+
+    Separador("4b. Generar mapa de bodegas (Leaflet)");
+    string rutaMapa = Path.Combine(AppContext.BaseDirectory, "mapa_productos.html");
+    string? mapaGenerado = MapaBodegas.Generar(listado.productos, rutaMapa);
+    if (mapaGenerado is not null)
+    {
+        Console.WriteLine($"Mapa generado: {mapaGenerado}");
+        Console.WriteLine("Cada categoría se ubica en una bodega/tienda distinta (Quito, Guayaquil, Cuenca, Ambato).");
+        MapaBodegas.AbrirEnNavegador(mapaGenerado);
+    }
+    else
+    {
+        Console.WriteLine("No hay productos registrados todavía, no se generó el mapa.");
+    }
 
     Separador("5. Actualizar stock de P301 a 30 unidades");
     Mostrar(await cliente.ActualizarStockAsync(new ActualizarStockRequest("P301", 30)));
