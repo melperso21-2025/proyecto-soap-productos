@@ -97,6 +97,9 @@ PHP) y pruebas en SoapUI.
       *(Ya tienes el checklist en `evidencias/checklist_soapui.md`.)*
 - [x] Guardar capturas en `evidencias/` (WSDL importado, request XML,
       response XML, por operación) — 14 evidencias subidas.
+- [x] Cliente adicional en C# (`cliente-csharp/`, `dotnet-svcutil`) para la
+      entrega individual — mismas 7 demostraciones que los clientes de
+      Python y PHP, probado contra el servidor real.
 - [ ] Al final: empaquetar el zip de entrega (`Apellido_Nombre_TareaSOAP.zip`).
 
 ### Israel (`feature/cliente-python`)
