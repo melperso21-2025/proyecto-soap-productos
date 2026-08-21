@@ -136,6 +136,197 @@
         </xsd:complexType>
       </xsd:element>
 
+      <!-- ============================================================ -->
+      <!-- MEJORA ADICIONAL: Locales (sucursales) y stock por tienda.    -->
+      <!-- Vive en un portType/service SEPARADO (LocalesService, mas     -->
+      <!-- abajo) para no mezclarse con las 6 operaciones calificadas de -->
+      <!-- ProductosPortType, que quedan exactamente como el enunciado   -->
+      <!-- las pide. Requiere Supabase configurado (un local con su      -->
+      <!-- ubicacion geografica no tiene sentido como dato en memoria).  -->
+      <!-- ============================================================ -->
+
+      <xsd:complexType name="Local">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:int"/>
+          <xsd:element name="nombre" type="xsd:string"/>
+          <xsd:element name="lat" type="xsd:decimal"/>
+          <xsd:element name="lng" type="xsd:decimal"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="ProductoLocal">
+        <xsd:sequence>
+          <xsd:element name="codigo" type="xsd:string"/>
+          <xsd:element name="nombre" type="xsd:string"/>
+          <xsd:element name="precio" type="xsd:decimal"/>
+          <xsd:element name="cantidad" type="xsd:int"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="StockLocalItem">
+        <xsd:sequence>
+          <xsd:element name="localId" type="xsd:int"/>
+          <xsd:element name="nombre" type="xsd:string"/>
+          <xsd:element name="lat" type="xsd:decimal"/>
+          <xsd:element name="lng" type="xsd:decimal"/>
+          <xsd:element name="cantidad" type="xsd:int"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:complexType name="LocalConProductos">
+        <xsd:sequence>
+          <xsd:element name="id" type="xsd:int"/>
+          <xsd:element name="nombre" type="xsd:string"/>
+          <xsd:element name="lat" type="xsd:decimal"/>
+          <xsd:element name="lng" type="xsd:decimal"/>
+          <xsd:element name="productos" type="tns:ProductoLocal" minOccurs="0" maxOccurs="unbounded"/>
+          <xsd:element name="valorTotal" type="xsd:decimal"/>
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <!-- CrearLocal -->
+      <xsd:element name="CrearLocalRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="nombre" type="xsd:string"/>
+            <xsd:element name="lat" type="xsd:decimal"/>
+            <xsd:element name="lng" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CrearLocalResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+            <xsd:element name="local" type="tns:Local" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- ListarLocales -->
+      <xsd:element name="ListarLocalesRequest">
+        <xsd:complexType>
+          <xsd:sequence/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ListarLocalesResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="locales" type="tns:Local" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- ActualizarLocal -->
+      <xsd:element name="ActualizarLocalRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:int"/>
+            <xsd:element name="nombre" type="xsd:string"/>
+            <xsd:element name="lat" type="xsd:decimal"/>
+            <xsd:element name="lng" type="xsd:decimal"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ActualizarLocalResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+            <xsd:element name="local" type="tns:Local" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- EliminarLocal -->
+      <xsd:element name="EliminarLocalRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="id" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="EliminarLocalResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- AsignarStockLocal -->
+      <xsd:element name="AsignarStockLocalRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigo" type="xsd:string"/>
+            <xsd:element name="localId" type="xsd:int"/>
+            <xsd:element name="cantidad" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="AsignarStockLocalResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- ConsultarStockPorLocal -->
+      <xsd:element name="ConsultarStockPorLocalRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigo" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ConsultarStockPorLocalResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+            <xsd:element name="stockPorLocal" type="tns:StockLocalItem" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- ObtenerMapaLocales -->
+      <xsd:element name="ObtenerMapaLocalesRequest">
+        <xsd:complexType>
+          <xsd:sequence/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ObtenerMapaLocalesResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="locales" type="tns:LocalConProductos" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <!-- CalcularValorPorLocal -->
+      <xsd:element name="CalcularValorPorLocalRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="localId" type="xsd:int"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="CalcularValorPorLocalResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="estado" type="xsd:boolean"/>
+            <xsd:element name="mensaje" type="xsd:string"/>
+            <xsd:element name="localNombre" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="productos" type="tns:ProductoLocal" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="valorTotal" type="xsd:decimal" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
     </xsd:schema>
   </types>
 
@@ -182,6 +373,65 @@
   </message>
   <message name="EliminarProductoOutput">
     <part name="parameters" element="tns:EliminarProductoResponse"/>
+  </message>
+
+  <!-- ============================================================ -->
+  <!-- MEJORA ADICIONAL: mensajes de Locales (ver LocalesPortType)   -->
+  <!-- ============================================================ -->
+  <message name="CrearLocalInput">
+    <part name="parameters" element="tns:CrearLocalRequest"/>
+  </message>
+  <message name="CrearLocalOutput">
+    <part name="parameters" element="tns:CrearLocalResponse"/>
+  </message>
+
+  <message name="ListarLocalesInput">
+    <part name="parameters" element="tns:ListarLocalesRequest"/>
+  </message>
+  <message name="ListarLocalesOutput">
+    <part name="parameters" element="tns:ListarLocalesResponse"/>
+  </message>
+
+  <message name="ActualizarLocalInput">
+    <part name="parameters" element="tns:ActualizarLocalRequest"/>
+  </message>
+  <message name="ActualizarLocalOutput">
+    <part name="parameters" element="tns:ActualizarLocalResponse"/>
+  </message>
+
+  <message name="EliminarLocalInput">
+    <part name="parameters" element="tns:EliminarLocalRequest"/>
+  </message>
+  <message name="EliminarLocalOutput">
+    <part name="parameters" element="tns:EliminarLocalResponse"/>
+  </message>
+
+  <message name="AsignarStockLocalInput">
+    <part name="parameters" element="tns:AsignarStockLocalRequest"/>
+  </message>
+  <message name="AsignarStockLocalOutput">
+    <part name="parameters" element="tns:AsignarStockLocalResponse"/>
+  </message>
+
+  <message name="ConsultarStockPorLocalInput">
+    <part name="parameters" element="tns:ConsultarStockPorLocalRequest"/>
+  </message>
+  <message name="ConsultarStockPorLocalOutput">
+    <part name="parameters" element="tns:ConsultarStockPorLocalResponse"/>
+  </message>
+
+  <message name="ObtenerMapaLocalesInput">
+    <part name="parameters" element="tns:ObtenerMapaLocalesRequest"/>
+  </message>
+  <message name="ObtenerMapaLocalesOutput">
+    <part name="parameters" element="tns:ObtenerMapaLocalesResponse"/>
+  </message>
+
+  <message name="CalcularValorPorLocalInput">
+    <part name="parameters" element="tns:CalcularValorPorLocalRequest"/>
+  </message>
+  <message name="CalcularValorPorLocalOutput">
+    <part name="parameters" element="tns:CalcularValorPorLocalResponse"/>
   </message>
 
   <!-- ============================================================ -->
@@ -258,6 +508,100 @@
   <service name="ProductosService">
     <port name="ProductosPort" binding="tns:ProductosBinding">
       <soap:address location="http://localhost:8000/productos"/>
+    </port>
+  </service>
+
+  <!-- ============================================================ -->
+  <!-- MEJORA ADICIONAL: Locales (sucursales) y stock por tienda.    -->
+  <!-- PortType/binding/service PROPIO y separado de ProductosPort-  -->
+  <!-- Type: las 6 operaciones calificadas de la tarea (arriba) no   -->
+  <!-- cambian en absoluto: siguen siendo exactamente las 6 que pide -->
+  <!-- el enunciado. Esto es una extension adicional del mismo WSDL, -->
+  <!-- expuesta en el mismo endpoint SOAP.                           -->
+  <!-- ============================================================ -->
+  <portType name="LocalesPortType">
+    <operation name="CrearLocal">
+      <input message="tns:CrearLocalInput"/>
+      <output message="tns:CrearLocalOutput"/>
+    </operation>
+    <operation name="ListarLocales">
+      <input message="tns:ListarLocalesInput"/>
+      <output message="tns:ListarLocalesOutput"/>
+    </operation>
+    <operation name="ActualizarLocal">
+      <input message="tns:ActualizarLocalInput"/>
+      <output message="tns:ActualizarLocalOutput"/>
+    </operation>
+    <operation name="EliminarLocal">
+      <input message="tns:EliminarLocalInput"/>
+      <output message="tns:EliminarLocalOutput"/>
+    </operation>
+    <operation name="AsignarStockLocal">
+      <input message="tns:AsignarStockLocalInput"/>
+      <output message="tns:AsignarStockLocalOutput"/>
+    </operation>
+    <operation name="ConsultarStockPorLocal">
+      <input message="tns:ConsultarStockPorLocalInput"/>
+      <output message="tns:ConsultarStockPorLocalOutput"/>
+    </operation>
+    <operation name="ObtenerMapaLocales">
+      <input message="tns:ObtenerMapaLocalesInput"/>
+      <output message="tns:ObtenerMapaLocalesOutput"/>
+    </operation>
+    <operation name="CalcularValorPorLocal">
+      <input message="tns:CalcularValorPorLocalInput"/>
+      <output message="tns:CalcularValorPorLocalOutput"/>
+    </operation>
+  </portType>
+
+  <binding name="LocalesBinding" type="tns:LocalesPortType">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <operation name="CrearLocal">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/CrearLocal"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="ListarLocales">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/ListarLocales"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="ActualizarLocal">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/ActualizarLocal"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="EliminarLocal">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/EliminarLocal"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="AsignarStockLocal">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/AsignarStockLocal"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="ConsultarStockPorLocal">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/ConsultarStockPorLocal"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="ObtenerMapaLocales">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/ObtenerMapaLocales"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+    <operation name="CalcularValorPorLocal">
+      <soap:operation soapAction="http://productos.tarea.com/wsdl/CalcularValorPorLocal"/>
+      <input><soap:body use="literal"/></input>
+      <output><soap:body use="literal"/></output>
+    </operation>
+  </binding>
+
+  <service name="LocalesService">
+    <port name="LocalesPort" binding="tns:LocalesBinding">
+      <soap:address location="http://localhost:8000/locales"/>
     </port>
   </service>
 

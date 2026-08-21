@@ -269,6 +269,342 @@ namespace ClienteSoap.ProductosService
         }
     }
     
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://productos.tarea.com/wsdl")]
+    public partial class ProductoLocal
+    {
+        
+        private string codigoField;
+        
+        private string nombreField;
+        
+        private decimal precioField;
+        
+        private int cantidadField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+        public string codigo
+        {
+            get
+            {
+                return this.codigoField;
+            }
+            set
+            {
+                this.codigoField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=1)]
+        public string nombre
+        {
+            get
+            {
+                return this.nombreField;
+            }
+            set
+            {
+                this.nombreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=2)]
+        public decimal precio
+        {
+            get
+            {
+                return this.precioField;
+            }
+            set
+            {
+                this.precioField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
+        public int cantidad
+        {
+            get
+            {
+                return this.cantidadField;
+            }
+            set
+            {
+                this.cantidadField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://productos.tarea.com/wsdl")]
+    public partial class LocalConProductos
+    {
+        
+        private int idField;
+        
+        private string nombreField;
+        
+        private decimal latField;
+        
+        private decimal lngField;
+        
+        private ProductoLocal[] productosField;
+        
+        private decimal valorTotalField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+        public int id
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=1)]
+        public string nombre
+        {
+            get
+            {
+                return this.nombreField;
+            }
+            set
+            {
+                this.nombreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=2)]
+        public decimal lat
+        {
+            get
+            {
+                return this.latField;
+            }
+            set
+            {
+                this.latField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
+        public decimal lng
+        {
+            get
+            {
+                return this.lngField;
+            }
+            set
+            {
+                this.lngField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("productos", Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=4)]
+        public ProductoLocal[] productos
+        {
+            get
+            {
+                return this.productosField;
+            }
+            set
+            {
+                this.productosField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=5)]
+        public decimal valorTotal
+        {
+            get
+            {
+                return this.valorTotalField;
+            }
+            set
+            {
+                this.valorTotalField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://productos.tarea.com/wsdl")]
+    public partial class StockLocalItem
+    {
+        
+        private int localIdField;
+        
+        private string nombreField;
+        
+        private decimal latField;
+        
+        private decimal lngField;
+        
+        private int cantidadField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+        public int localId
+        {
+            get
+            {
+                return this.localIdField;
+            }
+            set
+            {
+                this.localIdField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=1)]
+        public string nombre
+        {
+            get
+            {
+                return this.nombreField;
+            }
+            set
+            {
+                this.nombreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=2)]
+        public decimal lat
+        {
+            get
+            {
+                return this.latField;
+            }
+            set
+            {
+                this.latField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
+        public decimal lng
+        {
+            get
+            {
+                return this.lngField;
+            }
+            set
+            {
+                this.lngField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=4)]
+        public int cantidad
+        {
+            get
+            {
+                return this.cantidadField;
+            }
+            set
+            {
+                this.cantidadField = value;
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://productos.tarea.com/wsdl")]
+    public partial class Local
+    {
+        
+        private int idField;
+        
+        private string nombreField;
+        
+        private decimal latField;
+        
+        private decimal lngField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=0)]
+        public int id
+        {
+            get
+            {
+                return this.idField;
+            }
+            set
+            {
+                this.idField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=1)]
+        public string nombre
+        {
+            get
+            {
+                return this.nombreField;
+            }
+            set
+            {
+                this.nombreField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=2)]
+        public decimal lat
+        {
+            get
+            {
+                return this.latField;
+            }
+            set
+            {
+                this.latField = value;
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified, Order=3)]
+        public decimal lng
+        {
+            get
+            {
+                return this.lngField;
+            }
+            set
+            {
+                this.lngField = value;
+            }
+        }
+    }
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -603,6 +939,607 @@ namespace ClienteSoap.ProductosService
         {
             
             ProductosPort,
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://productos.tarea.com/wsdl", ConfigurationName="ClienteSoap.ProductosService.LocalesPortType")]
+    public interface LocalesPortType
+    {
+        
+        // CODEGEN: Generando contrato de mensaje, ya que la operación tiene múltiples valores devueltos.
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/CrearLocal", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.CrearLocalResponse> CrearLocalAsync(ClienteSoap.ProductosService.CrearLocalRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/ListarLocales", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.ListarLocalesResponse> ListarLocalesAsync(ClienteSoap.ProductosService.ListarLocalesRequest request);
+        
+        // CODEGEN: Generando contrato de mensaje, ya que la operación tiene múltiples valores devueltos.
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/ActualizarLocal", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.ActualizarLocalResponse> ActualizarLocalAsync(ClienteSoap.ProductosService.ActualizarLocalRequest request);
+        
+        // CODEGEN: Generando contrato de mensaje, ya que la operación tiene múltiples valores devueltos.
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/EliminarLocal", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.EliminarLocalResponse> EliminarLocalAsync(ClienteSoap.ProductosService.EliminarLocalRequest request);
+        
+        // CODEGEN: Generando contrato de mensaje, ya que la operación tiene múltiples valores devueltos.
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/AsignarStockLocal", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.AsignarStockLocalResponse> AsignarStockLocalAsync(ClienteSoap.ProductosService.AsignarStockLocalRequest request);
+        
+        // CODEGEN: Generando contrato de mensaje, ya que la operación tiene múltiples valores devueltos.
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/ConsultarStockPorLocal", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.ConsultarStockPorLocalResponse> ConsultarStockPorLocalAsync(ClienteSoap.ProductosService.ConsultarStockPorLocalRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/ObtenerMapaLocales", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.ObtenerMapaLocalesResponse> ObtenerMapaLocalesAsync(ClienteSoap.ProductosService.ObtenerMapaLocalesRequest request);
+        
+        // CODEGEN: Generando contrato de mensaje, ya que la operación tiene múltiples valores devueltos.
+        [System.ServiceModel.OperationContractAttribute(Action="http://productos.tarea.com/wsdl/CalcularValorPorLocal", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.CalcularValorPorLocalResponse> CalcularValorPorLocalAsync(ClienteSoap.ProductosService.CalcularValorPorLocalRequest request);
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CrearLocalRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class CrearLocalRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string nombre;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public decimal lat;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public decimal lng;
+        
+        public CrearLocalRequest()
+        {
+        }
+        
+        public CrearLocalRequest(string nombre, decimal lat, decimal lng)
+        {
+            this.nombre = nombre;
+            this.lat = lat;
+            this.lng = lng;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CrearLocalResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class CrearLocalResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool estado;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string mensaje;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ClienteSoap.ProductosService.Local local;
+        
+        public CrearLocalResponse()
+        {
+        }
+        
+        public CrearLocalResponse(bool estado, string mensaje, ClienteSoap.ProductosService.Local local)
+        {
+            this.estado = estado;
+            this.mensaje = mensaje;
+            this.local = local;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ListarLocalesRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ListarLocalesRequest
+    {
+        
+        public ListarLocalesRequest()
+        {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ListarLocalesResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ListarLocalesResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("locales", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ClienteSoap.ProductosService.Local[] locales;
+        
+        public ListarLocalesResponse()
+        {
+        }
+        
+        public ListarLocalesResponse(ClienteSoap.ProductosService.Local[] locales)
+        {
+            this.locales = locales;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ActualizarLocalRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ActualizarLocalRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public int id;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string nombre;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public decimal lat;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public decimal lng;
+        
+        public ActualizarLocalRequest()
+        {
+        }
+        
+        public ActualizarLocalRequest(int id, string nombre, decimal lat, decimal lng)
+        {
+            this.id = id;
+            this.nombre = nombre;
+            this.lat = lat;
+            this.lng = lng;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ActualizarLocalResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ActualizarLocalResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool estado;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string mensaje;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ClienteSoap.ProductosService.Local local;
+        
+        public ActualizarLocalResponse()
+        {
+        }
+        
+        public ActualizarLocalResponse(bool estado, string mensaje, ClienteSoap.ProductosService.Local local)
+        {
+            this.estado = estado;
+            this.mensaje = mensaje;
+            this.local = local;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="EliminarLocalRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class EliminarLocalRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public int id;
+        
+        public EliminarLocalRequest()
+        {
+        }
+        
+        public EliminarLocalRequest(int id)
+        {
+            this.id = id;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="EliminarLocalResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class EliminarLocalResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool estado;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string mensaje;
+        
+        public EliminarLocalResponse()
+        {
+        }
+        
+        public EliminarLocalResponse(bool estado, string mensaje)
+        {
+            this.estado = estado;
+            this.mensaje = mensaje;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="AsignarStockLocalRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class AsignarStockLocalRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string codigo;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public int localId;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public int cantidad;
+        
+        public AsignarStockLocalRequest()
+        {
+        }
+        
+        public AsignarStockLocalRequest(string codigo, int localId, int cantidad)
+        {
+            this.codigo = codigo;
+            this.localId = localId;
+            this.cantidad = cantidad;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="AsignarStockLocalResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class AsignarStockLocalResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool estado;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string mensaje;
+        
+        public AsignarStockLocalResponse()
+        {
+        }
+        
+        public AsignarStockLocalResponse(bool estado, string mensaje)
+        {
+            this.estado = estado;
+            this.mensaje = mensaje;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ConsultarStockPorLocalRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ConsultarStockPorLocalRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string codigo;
+        
+        public ConsultarStockPorLocalRequest()
+        {
+        }
+        
+        public ConsultarStockPorLocalRequest(string codigo)
+        {
+            this.codigo = codigo;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ConsultarStockPorLocalResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ConsultarStockPorLocalResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool estado;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string mensaje;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute("stockPorLocal", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ClienteSoap.ProductosService.StockLocalItem[] stockPorLocal;
+        
+        public ConsultarStockPorLocalResponse()
+        {
+        }
+        
+        public ConsultarStockPorLocalResponse(bool estado, string mensaje, ClienteSoap.ProductosService.StockLocalItem[] stockPorLocal)
+        {
+            this.estado = estado;
+            this.mensaje = mensaje;
+            this.stockPorLocal = stockPorLocal;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ObtenerMapaLocalesRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ObtenerMapaLocalesRequest
+    {
+        
+        public ObtenerMapaLocalesRequest()
+        {
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="ObtenerMapaLocalesResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class ObtenerMapaLocalesResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("locales", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ClienteSoap.ProductosService.LocalConProductos[] locales;
+        
+        public ObtenerMapaLocalesResponse()
+        {
+        }
+        
+        public ObtenerMapaLocalesResponse(ClienteSoap.ProductosService.LocalConProductos[] locales)
+        {
+            this.locales = locales;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CalcularValorPorLocalRequest", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class CalcularValorPorLocalRequest
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public int localId;
+        
+        public CalcularValorPorLocalRequest()
+        {
+        }
+        
+        public CalcularValorPorLocalRequest(int localId)
+        {
+            this.localId = localId;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    [System.ServiceModel.MessageContractAttribute(WrapperName="CalcularValorPorLocalResponse", WrapperNamespace="http://productos.tarea.com/wsdl", IsWrapped=true)]
+    public partial class CalcularValorPorLocalResponse
+    {
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public bool estado;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string mensaje;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string localNombre;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute("productos", Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public ClienteSoap.ProductosService.ProductoLocal[] productos;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://productos.tarea.com/wsdl", Order=4)]
+        [System.Xml.Serialization.XmlElementAttribute(Form=System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public decimal valorTotal;
+        
+        public CalcularValorPorLocalResponse()
+        {
+        }
+        
+        public CalcularValorPorLocalResponse(bool estado, string mensaje, string localNombre, ClienteSoap.ProductosService.ProductoLocal[] productos, decimal valorTotal)
+        {
+            this.estado = estado;
+            this.mensaje = mensaje;
+            this.localNombre = localNombre;
+            this.productos = productos;
+            this.valorTotal = valorTotal;
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    public interface LocalesPortTypeChannel : ClienteSoap.ProductosService.LocalesPortType, System.ServiceModel.IClientChannel
+    {
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.Tools.ServiceModel.Svcutil", "8.0.0")]
+    public partial class LocalesPortTypeClient : System.ServiceModel.ClientBase<ClienteSoap.ProductosService.LocalesPortType>, ClienteSoap.ProductosService.LocalesPortType
+    {
+        
+        /// <summary>
+        /// Implemente este método parcial para configurar el punto de conexión de servicio.
+        /// </summary>
+        /// <param name="serviceEndpoint">El punto de conexión para configurar</param>
+        /// <param name="clientCredentials">Credenciales de cliente</param>
+        static partial void ConfigureEndpoint(System.ServiceModel.Description.ServiceEndpoint serviceEndpoint, System.ServiceModel.Description.ClientCredentials clientCredentials);
+        
+        public LocalesPortTypeClient() : 
+                base(LocalesPortTypeClient.GetDefaultBinding(), LocalesPortTypeClient.GetDefaultEndpointAddress())
+        {
+            this.Endpoint.Name = EndpointConfiguration.LocalesPort.ToString();
+            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
+        }
+        
+        public LocalesPortTypeClient(EndpointConfiguration endpointConfiguration) : 
+                base(LocalesPortTypeClient.GetBindingForEndpoint(endpointConfiguration), LocalesPortTypeClient.GetEndpointAddress(endpointConfiguration))
+        {
+            this.Endpoint.Name = endpointConfiguration.ToString();
+            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
+        }
+        
+        public LocalesPortTypeClient(EndpointConfiguration endpointConfiguration, string remoteAddress) : 
+                base(LocalesPortTypeClient.GetBindingForEndpoint(endpointConfiguration), new System.ServiceModel.EndpointAddress(remoteAddress))
+        {
+            this.Endpoint.Name = endpointConfiguration.ToString();
+            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
+        }
+        
+        public LocalesPortTypeClient(EndpointConfiguration endpointConfiguration, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(LocalesPortTypeClient.GetBindingForEndpoint(endpointConfiguration), remoteAddress)
+        {
+            this.Endpoint.Name = endpointConfiguration.ToString();
+            ConfigureEndpoint(this.Endpoint, this.ClientCredentials);
+        }
+        
+        public LocalesPortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(binding, remoteAddress)
+        {
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.CrearLocalResponse> CrearLocalAsync(ClienteSoap.ProductosService.CrearLocalRequest request)
+        {
+            return base.Channel.CrearLocalAsync(request);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.ListarLocalesResponse> ClienteSoap.ProductosService.LocalesPortType.ListarLocalesAsync(ClienteSoap.ProductosService.ListarLocalesRequest request)
+        {
+            return base.Channel.ListarLocalesAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.ListarLocalesResponse> ListarLocalesAsync()
+        {
+            ClienteSoap.ProductosService.ListarLocalesRequest inValue = new ClienteSoap.ProductosService.ListarLocalesRequest();
+            return ((ClienteSoap.ProductosService.LocalesPortType)(this)).ListarLocalesAsync(inValue);
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.ActualizarLocalResponse> ActualizarLocalAsync(ClienteSoap.ProductosService.ActualizarLocalRequest request)
+        {
+            return base.Channel.ActualizarLocalAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.EliminarLocalResponse> EliminarLocalAsync(ClienteSoap.ProductosService.EliminarLocalRequest request)
+        {
+            return base.Channel.EliminarLocalAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.AsignarStockLocalResponse> AsignarStockLocalAsync(ClienteSoap.ProductosService.AsignarStockLocalRequest request)
+        {
+            return base.Channel.AsignarStockLocalAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.ConsultarStockPorLocalResponse> ConsultarStockPorLocalAsync(ClienteSoap.ProductosService.ConsultarStockPorLocalRequest request)
+        {
+            return base.Channel.ConsultarStockPorLocalAsync(request);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<ClienteSoap.ProductosService.ObtenerMapaLocalesResponse> ClienteSoap.ProductosService.LocalesPortType.ObtenerMapaLocalesAsync(ClienteSoap.ProductosService.ObtenerMapaLocalesRequest request)
+        {
+            return base.Channel.ObtenerMapaLocalesAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.ObtenerMapaLocalesResponse> ObtenerMapaLocalesAsync()
+        {
+            ClienteSoap.ProductosService.ObtenerMapaLocalesRequest inValue = new ClienteSoap.ProductosService.ObtenerMapaLocalesRequest();
+            return ((ClienteSoap.ProductosService.LocalesPortType)(this)).ObtenerMapaLocalesAsync(inValue);
+        }
+        
+        public System.Threading.Tasks.Task<ClienteSoap.ProductosService.CalcularValorPorLocalResponse> CalcularValorPorLocalAsync(ClienteSoap.ProductosService.CalcularValorPorLocalRequest request)
+        {
+            return base.Channel.CalcularValorPorLocalAsync(request);
+        }
+        
+        public virtual System.Threading.Tasks.Task OpenAsync()
+        {
+            return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndOpen));
+        }
+        
+        #if !NET6_0_OR_GREATER
+        public virtual System.Threading.Tasks.Task CloseAsync()
+        {
+            return System.Threading.Tasks.Task.Factory.FromAsync(((System.ServiceModel.ICommunicationObject)(this)).BeginClose(null, null), new System.Action<System.IAsyncResult>(((System.ServiceModel.ICommunicationObject)(this)).EndClose));
+        }
+        #endif
+        
+        private static System.ServiceModel.Channels.Binding GetBindingForEndpoint(EndpointConfiguration endpointConfiguration)
+        {
+            if ((endpointConfiguration == EndpointConfiguration.LocalesPort))
+            {
+                System.ServiceModel.BasicHttpBinding result = new System.ServiceModel.BasicHttpBinding();
+                result.MaxBufferSize = int.MaxValue;
+                result.ReaderQuotas = System.Xml.XmlDictionaryReaderQuotas.Max;
+                result.MaxReceivedMessageSize = int.MaxValue;
+                result.AllowCookies = true;
+                return result;
+            }
+            throw new System.InvalidOperationException(string.Format("No se pudo encontrar un punto de conexión con el nombre \"{0}\".", endpointConfiguration));
+        }
+        
+        private static System.ServiceModel.EndpointAddress GetEndpointAddress(EndpointConfiguration endpointConfiguration)
+        {
+            if ((endpointConfiguration == EndpointConfiguration.LocalesPort))
+            {
+                return new System.ServiceModel.EndpointAddress("http://localhost:8000/locales");
+            }
+            throw new System.InvalidOperationException(string.Format("No se pudo encontrar un punto de conexión con el nombre \"{0}\".", endpointConfiguration));
+        }
+        
+        private static System.ServiceModel.Channels.Binding GetDefaultBinding()
+        {
+            return LocalesPortTypeClient.GetBindingForEndpoint(EndpointConfiguration.LocalesPort);
+        }
+        
+        private static System.ServiceModel.EndpointAddress GetDefaultEndpointAddress()
+        {
+            return LocalesPortTypeClient.GetEndpointAddress(EndpointConfiguration.LocalesPort);
+        }
+        
+        public enum EndpointConfiguration
+        {
+            
+            LocalesPort,
         }
     }
 }

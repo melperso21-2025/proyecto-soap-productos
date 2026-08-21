@@ -8,6 +8,7 @@ const soap = require("soap");
 const productos = require("./data/productos");
 const supabaseClient = require("./db/supabaseClient");
 const operaciones = require("./operaciones");
+const operacionesLocales = require("./operacionesLocales");
 const { montarApiRest } = require("./rest");
 
 const PORT = process.env.PORT || 8000;
@@ -56,6 +57,45 @@ const service = {
       },
     },
   },
+
+  // Mejora adicional: locales (sucursales) y stock por tienda. Vive en un
+  // portType/service separado (LocalesPortType) para no mezclarse con las
+  // 6 operaciones calificadas de arriba, que quedan exactamente iguales.
+  LocalesService: {
+    LocalesPort: {
+      CrearLocal: (args, callback) => {
+        operacionesLocales.crearLocal(args).then(callback);
+      },
+
+      ListarLocales: (_args, callback) => {
+        operacionesLocales.listarLocales().then((locales) => callback({ locales }));
+      },
+
+      ActualizarLocal: (args, callback) => {
+        operacionesLocales.actualizarLocal(args.id, args).then(callback);
+      },
+
+      EliminarLocal: (args, callback) => {
+        operacionesLocales.eliminarLocal(args.id).then(callback);
+      },
+
+      AsignarStockLocal: (args, callback) => {
+        operacionesLocales.asignarStockLocal(args.codigo, args.localId, args.cantidad).then(callback);
+      },
+
+      ConsultarStockPorLocal: (args, callback) => {
+        operacionesLocales.consultarStockPorLocal(args.codigo).then(callback);
+      },
+
+      ObtenerMapaLocales: (_args, callback) => {
+        operacionesLocales.obtenerMapaLocales().then((locales) => callback({ locales }));
+      },
+
+      CalcularValorPorLocal: (args, callback) => {
+        operacionesLocales.calcularValorPorLocal(args.localId).then(callback);
+      },
+    },
+  },
 };
 
 async function iniciar() {
@@ -76,9 +116,18 @@ async function iniciar() {
 
   soap.listen(server, "/productos", service, wsdlXml);
 
+  // LocalesService vive en su propia ruta: node-soap resuelve el binding
+  // de una peticion entrante comparando el pathname contra la direccion
+  // declarada en el WSDL para cada <port> -- si ProductosPort y LocalesPort
+  // compartieran "/productos", siempre resolveria al primero (el bug que
+  // encontramos al probarlo). Con rutas distintas, cada servicio despacha
+  // a su binding correcto.
+  soap.listen(server, "/locales", service, wsdlXml);
+
   server.listen(PORT, () => {
     console.log(`Servidor SOAP escuchando en http://localhost:${PORT}/productos`);
     console.log(`WSDL disponible en http://localhost:${PORT}/productos?wsdl`);
+    console.log(`Mejora adicional (Locales) SOAP en http://localhost:${PORT}/locales`);
     console.log(`API REST disponible en http://localhost:${PORT}/api/productos`);
   });
 }

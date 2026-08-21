@@ -4,6 +4,7 @@
 
 const express = require("express");
 const operaciones = require("./operaciones");
+const operacionesLocales = require("./operacionesLocales");
 const supabaseClient = require("./db/supabaseClient");
 
 function montarApiRest(app) {
@@ -26,10 +27,16 @@ function montarApiRest(app) {
         eliminar: "DELETE /api/productos/:codigo",
         equipo: "GET /api/equipo",
         instancia: "GET /api/instancia",
+        locales: "GET/POST /api/locales",
+        localesMapa: "GET /api/locales/mapa",
+        localesEditarEliminar: "PATCH/DELETE /api/locales/:id",
+        valorPorLocal: "GET /api/locales/:id/valor",
+        stockPorLocal: "GET/POST /api/productos/:codigo/stock-local",
       },
       fronts: {
         python: "http://127.0.0.1:5000",
         php: "http://localhost:5001",
+        csharp: "http://localhost:5002",
       },
     });
   });
@@ -67,6 +74,45 @@ function montarApiRest(app) {
   // corren su propio servidor apuntando al mismo Supabase compartido).
   app.get("/api/instancia", (_req, res) => {
     res.json({ nombre: operaciones.NOMBRE_INSTANCIA });
+  });
+
+  // ---- Locales (sucursales) y stock por local -- mejora adicional ----
+  // Estas rutas son un envoltorio delgado sobre operacionesLocales.js, la
+  // misma logica que usa el servicio SOAP en LocalesPortType (ver
+  // server.js) -- asi REST y SOAP responden exactamente igual. Se dejan
+  // disponibles por REST solo como comodidad para pruebas rapidas con
+  // Postman/curl; el camino "oficial" de la mejora es SOAP.
+
+  app.get("/api/locales", async (_req, res) => {
+    res.json(await operacionesLocales.listarLocales());
+  });
+
+  app.post("/api/locales", async (req, res) => {
+    res.json(await operacionesLocales.crearLocal(req.body));
+  });
+
+  app.get("/api/locales/mapa", async (_req, res) => {
+    res.json(await operacionesLocales.obtenerMapaLocales());
+  });
+
+  app.get("/api/locales/:id/valor", async (req, res) => {
+    res.json(await operacionesLocales.calcularValorPorLocal(req.params.id));
+  });
+
+  app.patch("/api/locales/:id", async (req, res) => {
+    res.json(await operacionesLocales.actualizarLocal(req.params.id, req.body));
+  });
+
+  app.delete("/api/locales/:id", async (req, res) => {
+    res.json(await operacionesLocales.eliminarLocal(req.params.id));
+  });
+
+  app.get("/api/productos/:codigo/stock-local", async (req, res) => {
+    res.json(await operacionesLocales.consultarStockPorLocal(req.params.codigo));
+  });
+
+  app.post("/api/productos/:codigo/stock-local", async (req, res) => {
+    res.json(await operacionesLocales.asignarStockLocal(req.params.codigo, req.body.localId, req.body.cantidad));
   });
 }
 

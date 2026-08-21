@@ -11,4 +11,12 @@
     <PackageReference Include="System.ServiceModel.NetTcp" Version="8.*" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="8.*" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- front/ es un proyecto ASP.NET Core propio (Front.csproj) con su
+         propio SDK web: sin este exclude, el glob por defecto de este
+         .csproj de consola tambien intenta compilar sus .cshtml.cs. -->
+    <Compile Remove="front/**" />
+    <Content Remove="front/**" />
+    <None Remove="front/**" />
+  </ItemGroup>
 </Project>

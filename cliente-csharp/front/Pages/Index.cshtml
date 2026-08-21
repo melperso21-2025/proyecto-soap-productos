@@ -1,0 +1,601 @@
+@page
+@model Front.Pages.IndexModel
+@{
+    Layout = "_Layout";
+}
+<div class="shell">
+  <nav class="sidebar" aria-label="Operaciones del servicio">
+    <div class="brand">
+      <div class="brand-mark">C#</div>
+      <div class="brand-text">
+        <span class="brand-name">Panel Productos</span>
+        <span class="brand-sub">SOAP · productos.wsdl</span>
+      </div>
+    </div>
+    <div class="lang-badge">Cliente C# · ASP.NET Core + dotnet-svcutil</div>
+
+    <div class="nav-label">Las 6 operaciones</div>
+    <div class="nav">
+      <a class="nav-item @(Model.Vista == "registrar" ? "active" : "")" href="/?view=registrar">
+        <span class="num">01</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+        Registrar producto
+      </a>
+      <a class="nav-item @(Model.Vista == "consultar" ? "active" : "")" href="/?view=consultar">
+        <span class="num">02</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8"/></svg>
+        Consultar producto
+      </a>
+      <a class="nav-item @(Model.Vista == "listar" ? "active" : "")" href="/?view=listar">
+        <span class="num">03</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>
+        Listar productos
+      </a>
+      <a class="nav-item @(Model.Vista == "stock" ? "active" : "")" href="/?view=stock">
+        <span class="num">04</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V13M10 19V9M16 19V5M4 13l6-4 6-4 0 0"/><path d="M15 5h5v5"/></svg>
+        Actualizar stock
+      </a>
+      <a class="nav-item @(Model.Vista == "valor" ? "active" : "")" href="/?view=valor">
+        <span class="num">05</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7.5h7M8 12h1M11.5 12h1M15 12h1M8 15.5h1M11.5 15.5h1M15 15.5h1"/></svg>
+        Calcular valor
+      </a>
+      <a class="nav-item @(Model.Vista == "eliminar" ? "active" : "")" href="/?view=eliminar">
+        <span class="num">06</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h14M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-9 0 1 12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1l1-12"/><path d="M10 11v6M14 11v6"/></svg>
+        Eliminar producto
+      </a>
+    </div>
+
+    <div class="nav-label">Mejora adicional</div>
+    <div class="nav">
+      <a class="nav-item @(Model.Vista == "locales" ? "active" : "")" href="/?view=locales">
+        <span class="num">07</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        Locales y stock
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <span class="instancia-pill"><span class="status-dot"></span>Servidor: @Model.Instancia</span>
+      <div class="team">
+        @if (Model.Equipo.Any())
+        {
+          @foreach (var integrante in Model.Equipo)
+          {
+            <div class="team-row"><span class="team-nombre">@integrante.nombre</span><span class="team-rol">@integrante.rol</span></div>
+          }
+        }
+        else
+        {
+          <text>Equipo no disponible (falló GET /api/equipo)</text>
+        }
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    @if (Model.FlashMensaje is not null)
+    {
+      <div class="result @(Model.FlashOk ? "result-ok" : "result-error")" style="margin-bottom:1.5rem;">
+        <div><b>@(Model.FlashOk ? "estado = true" : "estado = false")</b>@Model.FlashMensaje</div>
+      </div>
+    }
+
+    <!-- ============ 01 REGISTRAR ============ -->
+    <section class="view @(Model.Vista == "registrar" ? "active" : "")">
+      <div class="topline">
+        <div>
+          <span class="eyebrow">Operación 1 / 6 · RegistrarProducto</span>
+          <h1 class="page-title">Registrar producto</h1>
+          <p class="page-desc">Agrega un producto nuevo al inventario. El código debe ser único — si ya existe, el servicio lo rechaza.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+      </div>
+
+      <div class="card" style="max-width:32rem;">
+        <h3>Datos del producto <span class="tag">entrada</span></h3>
+        <form method="post" asp-page-handler="Registrar">
+          <div class="field"><label for="r-codigo">Código</label><input id="r-codigo" name="codigo" placeholder="P400" required></div>
+          <div class="field"><label for="r-nombre">Nombre</label><input id="r-nombre" name="nombre" placeholder="Silla gamer" required></div>
+          <div class="field-row">
+            <div class="field"><label for="r-categoria">Categoría</label><input id="r-categoria" name="categoria" placeholder="Mobiliario" required></div>
+            <div class="field"><label for="r-precio">Precio</label><input id="r-precio" name="precio" type="number" step="0.01" min="0.01" placeholder="189.90" required></div>
+          </div>
+          <div class="field"><label for="r-cantidad">Cantidad</label><input id="r-cantidad" name="cantidad" type="number" min="0" placeholder="10" required></div>
+
+          <div class="field" style="border-top:1px solid var(--border); margin-top:0.9rem; padding-top:0.9rem;">
+            <label for="r-tienda">Tienda inicial (opcional) <span class="tag" style="margin-left:0.4rem;">mejora adicional</span></label>
+            <select id="r-tienda" name="tiendaId">
+              <option value="">— Sin asignar —</option>
+              @foreach (var local in Model.Locales)
+              {
+                <option value="@local.id">@local.nombre</option>
+              }
+            </select>
+          </div>
+          <div class="field"><label for="r-cantidad-tienda">Cantidad en esa tienda</label><input id="r-cantidad-tienda" name="cantidadTienda" type="number" min="0" placeholder="10"></div>
+
+          <button class="btn btn-primary" type="submit">Registrar producto</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ 02 CONSULTAR ============ -->
+    <section class="view @(Model.Vista == "consultar" ? "active" : "")">
+      <div class="topline">
+        <div>
+          <span class="eyebrow">Operación 2 / 6 · ConsultarProducto</span>
+          <h1 class="page-title">Consultar producto</h1>
+          <p class="page-desc">Busca un producto por su código y muestra su ficha completa.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Buscar por código <span class="tag">entrada</span></h3>
+          <form method="post" asp-page-handler="Consultar">
+            <div class="field"><label for="c-codigo">Código</label><input id="c-codigo" name="codigo" value="@Model.CodigoPrefill" placeholder="P100" required></div>
+            <button class="btn btn-primary" type="submit">Consultar</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Ficha del producto <span class="tag">salida</span></h3>
+          @if (Model.ResultadoConsultaData is { } rc)
+          {
+            <div class="kv">
+              <div class="kv-row"><span class="k">Código</span><span class="v">@rc.Codigo</span></div>
+              <div class="kv-row"><span class="k">Nombre</span><span class="v">@rc.Nombre</span></div>
+              <div class="kv-row"><span class="k">Categoría</span><span class="v">@rc.Categoria</span></div>
+              <div class="kv-row"><span class="k">Precio</span><span class="v">$@(decimal.Parse(rc.Precio).ToString("0.00"))</span></div>
+              <div class="kv-row"><span class="k">Cantidad</span><span class="v">@(int.Parse(rc.Cantidad).ToString("D4"))</span></div>
+            </div>
+          }
+          else
+          {
+            <p class="vacio-nota">Todavía no has consultado ningún código en esta sesión.</p>
+          }
+        </div>
+      </div>
+
+      @if (Model.ResultadoConsultaData is { } rcMapa)
+      {
+        <div class="grid-2" style="margin-top:1.25rem;">
+          <div class="card">
+            <h3>Stock por local <span class="tag">mejora adicional</span></h3>
+            <div id="mapa-stock" style="height:260px; border-radius:6px; overflow:hidden; margin-bottom:0.9rem;"></div>
+            @if (Model.StockPorLocal.Any())
+            {
+              <div class="kv">
+                @foreach (var fila in Model.StockPorLocal)
+                {
+                  <div class="kv-row"><span class="k">@fila.nombre</span><span class="v">@fila.cantidad.ToString("D4")</span></div>
+                }
+              </div>
+            }
+            else
+            {
+              <p class="vacio-nota">Este producto todavía no tiene stock asignado a ningún local.</p>
+            }
+          </div>
+
+          <div class="card">
+            <h3>Asignar / actualizar stock en un local <span class="tag">entrada</span></h3>
+            @if (Model.Locales.Any())
+            {
+              <form method="post" asp-page-handler="AsignarStockLocal">
+                <input type="hidden" name="codigo" value="@rcMapa.Codigo">
+                <div class="field">
+                  <label for="sl-local">Local</label>
+                  <select id="sl-local" name="localId" required>
+                    @foreach (var local in Model.Locales)
+                    {
+                      <option value="@local.id">@local.nombre</option>
+                    }
+                  </select>
+                </div>
+                <div class="field"><label for="sl-cantidad">Cantidad en ese local</label><input id="sl-cantidad" name="cantidad" type="number" min="0" placeholder="15" required></div>
+                <button class="btn btn-primary" type="submit">Guardar</button>
+              </form>
+            }
+            else
+            {
+              <p class="vacio-nota">Todavía no hay locales creados — ve a "Locales y stock" para crear el primero.</p>
+            }
+          </div>
+        </div>
+      }
+    </section>
+
+    <!-- ============ 03 LISTAR ============ -->
+    <section class="view @(Model.Vista == "listar" ? "active" : "")">
+      <div class="topline">
+        <div>
+          <span class="eyebrow">Operación 3 / 6 · ListarProductos</span>
+          <h1 class="page-title">Productos registrados</h1>
+          <p class="page-desc">Vista general del inventario — no recibe parámetros de entrada.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="label">Productos registrados</div><div class="value">@Model.TotalProductos</div></div>
+        <div class="kpi"><div class="label">Valor total inventario</div><div class="value">$@Model.ValorTotalInventario.ToString("0.00")</div></div>
+        <div class="kpi"><div class="label">Bajo stock (&lt; 5)</div><div class="value @(Model.BajoStock > 0 ? "warn" : "")">@Model.BajoStock</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.25rem;">
+        <h3>Mapa de tiendas <span class="tag">mejora adicional</span></h3>
+        @if (Model.MapaLocales.Any())
+        {
+          <div id="mapa-listar" style="height:220px; border-radius:6px; overflow:hidden;"></div>
+        }
+        else
+        {
+          <p class="vacio-nota">Todavía no hay tiendas creadas — ve a "Locales y stock" para crear la primera.</p>
+        }
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th>Origen</th><th>Tiendas</th><th></th></tr></thead>
+          <tbody>
+            @if (!Model.Productos.Any())
+            {
+              <tr><td colspan="8" class="vacio">No hay productos registrados todavía.</td></tr>
+            }
+            @foreach (var p in Model.Productos)
+            {
+              <tr>
+                <td class="codigo">@p.codigo</td>
+                <td>@p.nombre</td>
+                <td>@p.categoria</td>
+                <td class="num">$@p.precio.ToString("0.00")</td>
+                <td class="num"><span class="stock-chip @(p.cantidad < 5 ? "stock-low" : "stock-ok")">@p.cantidad.ToString("D4")</span></td>
+                <td><span class="origen-chip">@(Model.Origenes.TryGetValue(p.codigo, out var origen) ? (origen ?? "—") : "—")</span></td>
+                <td>
+                  @if (Model.ResumenTiendas.TryGetValue(p.codigo, out var resumen))
+                  {
+                    <span class="origen-chip">@resumen.Tiendas tienda(s) · @resumen.Total u.</span>
+                  }
+                  else
+                  {
+                    <span class="vacio-nota" style="margin:0;">sin asignar</span>
+                  }
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <a class="icon-btn" href="/?view=consultar&codigo=@p.codigo">Consultar</a>
+                    <a class="icon-btn" href="/?view=stock&codigo=@p.codigo">Stock</a>
+                    <a class="icon-btn" href="/?handler=CalcularValor&codigo=@p.codigo">Valor</a>
+                    <form method="post" asp-page-handler="Eliminar" class="inline-form"
+                          onsubmit="return confirm('¿Eliminar @p.codigo? Esta acción no se puede deshacer.');">
+                      <input type="hidden" name="codigo" value="@p.codigo">
+                      <input type="hidden" name="next" value="listar">
+                      <button class="icon-btn icon-btn-danger" type="submit">Eliminar</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 04 STOCK ============ -->
+    <section class="view @(Model.Vista == "stock" ? "active" : "")">
+      <div class="topline">
+        <div>
+          <span class="eyebrow">Operación 4 / 6 · ActualizarStock</span>
+          <h1 class="page-title">Actualizar stock</h1>
+          <p class="page-desc">Cambia la cantidad disponible de un producto existente.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Nueva cantidad (global) <span class="tag">entrada</span></h3>
+          <form method="post" asp-page-handler="ActualizarStock">
+            <input type="hidden" name="next" value="stock">
+            <div class="field"><label for="s-codigo">Código</label><input id="s-codigo" name="codigo" value="@Model.CodigoPrefill" placeholder="P101" required></div>
+            <div class="field"><label for="s-cantidad">Nueva cantidad</label><input id="s-cantidad" name="cantidad" type="number" min="0" placeholder="20" required></div>
+            <button class="btn btn-primary" type="submit">Actualizar stock</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Actualizar stock en una tienda <span class="tag">mejora adicional</span></h3>
+          @if (Model.Locales.Any())
+          {
+            <form method="post" asp-page-handler="AsignarStockLocal">
+              <input type="hidden" name="next" value="stock">
+              <div class="field"><label for="st-codigo">Código</label><input id="st-codigo" name="codigo" value="@Model.CodigoPrefill" placeholder="P101" required></div>
+              <div class="field">
+                <label for="st-local">Tienda</label>
+                <select id="st-local" name="localId" required>
+                  @foreach (var local in Model.Locales)
+                  {
+                    <option value="@local.id">@local.nombre</option>
+                  }
+                </select>
+              </div>
+              <div class="field"><label for="st-cantidad">Cantidad en esa tienda</label><input id="st-cantidad" name="cantidad" type="number" min="0" placeholder="15" required></div>
+              <button class="btn btn-primary" type="submit">Guardar</button>
+            </form>
+          }
+          else
+          {
+            <p class="vacio-nota">Todavía no hay tiendas creadas — ve a "Locales y stock" para crear la primera.</p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 05 VALOR ============ -->
+    <section class="view @(Model.Vista == "valor" ? "active" : "")">
+      <div class="topline">
+        <div>
+          <span class="eyebrow">Operación 5 / 6 · CalcularValorInventario</span>
+          <h1 class="page-title">Calcular valor de inventario</h1>
+          <p class="page-desc">Multiplica precio × cantidad disponible para un producto.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Producto <span class="tag">entrada</span></h3>
+          <form method="get" asp-page-handler="CalcularValor">
+            <div class="field"><label for="v-codigo">Código</label><input id="v-codigo" name="codigo" value="@Model.CodigoPrefill" placeholder="P201" required></div>
+            <button class="btn btn-primary" type="submit">Calcular</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Resultado <span class="tag">salida</span></h3>
+          @if (Model.ResultadoValorData is { } rv)
+          {
+            <div class="stat-tile">
+              <span class="label">Valor total del inventario — @rv.Codigo</span>
+              <span class="amount">$@(decimal.Parse(rv.ValorTotal).ToString("0.00"))</span>
+              <span class="formula">$@(decimal.Parse(rv.Precio).ToString("0.00")) × @rv.Cantidad unidades (@rv.Nombre)</span>
+            </div>
+          }
+          else
+          {
+            <p class="vacio-nota">Todavía no has calculado el valor de ningún producto en esta sesión.</p>
+          }
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:1.25rem;">
+        <div class="card">
+          <h3>Valor por tienda <span class="tag">mejora adicional</span></h3>
+          @if (Model.Locales.Any())
+          {
+            <form method="get">
+              <input type="hidden" name="view" value="valor">
+              <div class="field">
+                <label for="vl-local">Tienda</label>
+                <select id="vl-local" name="localId" required>
+                  @foreach (var local in Model.Locales)
+                  {
+                    <option value="@local.id">@local.nombre</option>
+                  }
+                </select>
+              </div>
+              <button class="btn btn-primary" type="submit">Calcular</button>
+            </form>
+          }
+          else
+          {
+            <p class="vacio-nota">Todavía no hay tiendas creadas.</p>
+          }
+        </div>
+
+        <div class="card">
+          <h3>Resultado por tienda <span class="tag">salida</span></h3>
+          @if (Model.ResultadoValorLocalData is { Estado: true } rvl)
+          {
+            <div class="stat-tile">
+              <span class="label">Valor total en @rvl.LocalNombre</span>
+              <span class="amount">$@rvl.ValorTotal.ToString("0.00")</span>
+            </div>
+            @if (rvl.Productos.Any())
+            {
+              <div class="kv" style="margin-top:0.9rem;">
+                @foreach (var p in rvl.Productos)
+                {
+                  <div class="kv-row"><span class="k">@p.nombre</span><span class="v">@p.cantidad u. · $@p.precio.ToString("0.00")</span></div>
+                }
+              </div>
+            }
+            else
+            {
+              <p class="vacio-nota">Esta tienda todavía no tiene productos con stock asignado.</p>
+            }
+          }
+          else
+          {
+            <p class="vacio-nota">Todavía no has calculado el valor de ninguna tienda en esta sesión.</p>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 06 ELIMINAR ============ -->
+    <section class="view @(Model.Vista == "eliminar" ? "active" : "")">
+      <div class="topline">
+        <div>
+          <span class="eyebrow">Operación 6 / 6 · EliminarProducto</span>
+          <h1 class="page-title">Eliminar producto</h1>
+          <p class="page-desc">Quita un producto del inventario de forma permanente.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
+      </div>
+
+      <div class="card" style="max-width:26rem;">
+        <h3>Producto a eliminar <span class="tag">entrada</span></h3>
+        <form method="post" asp-page-handler="Eliminar"
+              onsubmit="return confirm('¿Eliminar este producto? Esta acción no se puede deshacer.');">
+          <input type="hidden" name="next" value="eliminar">
+          <div class="field"><label for="e-codigo">Código</label><input id="e-codigo" name="codigo" placeholder="P200" required></div>
+          <div class="danger-box">
+            <h4>Esta acción no se puede deshacer</h4>
+            <p>El producto se borra de la memoria del servidor y, si Supabase está conectado, también de la tabla persistida (incluyendo su stock en todas las tiendas).</p>
+          </div>
+          <button class="btn btn-danger" type="submit">Eliminar producto</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ 07 LOCALES (mejora adicional) ============ -->
+    <section class="view @(Model.Vista == "locales" ? "active" : "")">
+      <div class="topline">
+        <div>
+          <span class="eyebrow">Mejora adicional · LocalesService (WSDL)</span>
+          <h1 class="page-title">Locales y stock por sucursal</h1>
+          <p class="page-desc">Crea locales con su ubicación geográfica; luego, desde "Consultar producto", asigna cuánto stock de cada producto hay en cada local.</p>
+        </div>
+        <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl (LocalesService)</span>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>@(Model.LocalEditar is not null ? "Editar local" : "Nuevo local") <span class="tag">entrada</span></h3>
+          @if (Model.LocalEditar is { } le)
+          {
+            <form method="post" asp-page-handler="EditarLocal">
+              <input type="hidden" name="id" value="@le.id">
+              <div class="field"><label for="l-nombre">Nombre</label><input id="l-nombre" name="nombre" value="@le.nombre" required></div>
+              <div class="field-row">
+                <div class="field"><label for="l-lat">Latitud</label><input id="l-lat" name="lat" type="number" step="0.0001" value="@le.lat" required></div>
+                <div class="field"><label for="l-lng">Longitud</label><input id="l-lng" name="lng" type="number" step="0.0001" value="@le.lng" required></div>
+              </div>
+              <button class="btn btn-primary" type="submit">Guardar cambios</button>
+              <a class="icon-btn" href="/?view=locales" style="margin-left:0.6rem;">Cancelar</a>
+            </form>
+          }
+          else
+          {
+            <form method="post" asp-page-handler="CrearLocal">
+              <div class="field"><label for="l-nombre">Nombre</label><input id="l-nombre" name="nombre" placeholder="Local Manta" required></div>
+              <div class="field-row">
+                <div class="field"><label for="l-lat">Latitud</label><input id="l-lat" name="lat" type="number" step="0.0001" placeholder="-0.9500" required></div>
+                <div class="field"><label for="l-lng">Longitud</label><input id="l-lng" name="lng" type="number" step="0.0001" placeholder="-80.7300" required></div>
+              </div>
+              <button class="btn btn-primary" type="submit">Crear local</button>
+            </form>
+          }
+        </div>
+
+        <div class="card">
+          <h3>Locales registrados <span class="tag">salida</span></h3>
+          @if (Model.Locales.Any())
+          {
+            <div class="kv">
+              @foreach (var local in Model.Locales)
+              {
+                <div class="kv-row">
+                  <span class="k">@local.nombre</span>
+                  <span class="v">@local.lat.ToString("0.0000"), @local.lng.ToString("0.0000")</span>
+                  <div class="row-actions" style="margin-left:0.6rem;">
+                    <a class="icon-btn" href="/?view=locales&editar=@local.id">Editar</a>
+                    <form method="post" asp-page-handler="EliminarLocal" class="inline-form"
+                          onsubmit="return confirm('¿Eliminar @local.nombre? También se borra su stock asociado.');">
+                      <input type="hidden" name="id" value="@local.id">
+                      <button class="icon-btn icon-btn-danger" type="submit">Eliminar</button>
+                    </form>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+          else
+          {
+            <p class="vacio-nota">Todavía no hay locales creados.</p>
+          }
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:1.25rem;">
+        <h3>Mapa de tiendas <span class="tag">productos y stock</span></h3>
+        @if (Model.MapaLocales.Any())
+        {
+          <div id="mapa-locales-central" style="height:360px; border-radius:6px; overflow:hidden;"></div>
+        }
+        else
+        {
+          <p class="vacio-nota">Todavía no hay tiendas creadas.</p>
+        }
+      </div>
+    </section>
+  </main>
+</div>
+
+@if (Model.ResultadoConsultaData is not null || Model.MapaLocales.Any())
+{
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Dibuja un mapa Leaflet con un marcador por tienda; cada popup puede
+    // mostrar solo la cantidad (mapa por producto, en Consultar) o la lista
+    // completa de productos + valor (mapa de tiendas, en Listar/Locales).
+    function renderizarMapaTiendas(idContenedor, tiendas, popupHtml) {
+      const contenedor = document.getElementById(idContenedor);
+      if (!contenedor || !tiendas.length) return;
+      const mapa = L.map(contenedor).setView([-1.5, -78.9], 6.2);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(mapa);
+      const puntos = [];
+      tiendas.forEach(function (tienda) {
+        const punto = [tienda.lat, tienda.lng];
+        puntos.push(punto);
+        L.marker(punto).addTo(mapa).bindPopup(popupHtml(tienda));
+      });
+      if (puntos.length > 1) {
+        mapa.fitBounds(puntos, { padding: [24, 24] });
+      } else {
+        mapa.setView(puntos[0], 12);
+      }
+    }
+
+    @if (Model.ResultadoConsultaData is not null)
+    {
+      <text>
+      renderizarMapaTiendas(
+        'mapa-stock',
+        @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.StockPorLocal)),
+        function (fila) { return '<b>' + fila.nombre + '</b><br>' + fila.cantidad + ' unidades'; }
+      );
+      </text>
+    }
+
+    @if (Model.MapaLocales.Any())
+    {
+      <text>
+      function popupTienda(tienda) {
+        const lista = tienda.productos.length
+          ? tienda.productos.map(function (p) { return p.nombre + ' — ' + p.cantidad + ' u.'; }).join('<br>')
+          : 'Sin stock asignado';
+        return '<b>' + tienda.nombre + '</b><br>' + lista + '<br><b>Valor: $' + tienda.valorTotal.toFixed(2) + '</b>';
+      }
+      </text>
+      if (Model.Vista == "listar")
+      {
+        <text>renderizarMapaTiendas('mapa-listar', @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MapaLocales)), popupTienda);</text>
+      }
+      else if (Model.Vista == "locales")
+      {
+        <text>renderizarMapaTiendas('mapa-locales-central', @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MapaLocales)), popupTienda);</text>
+      }
+    }
+  </script>
+}

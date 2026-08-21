@@ -1,53 +1,52 @@
-/* Paleta propia del front PHP: mismo sistema de diseño que Python, pero con
-   un acento índigo/violeta (en vez del verde de Python) para poder
-   distinguir a simple vista qué front estás mirando. */
+/* Paleta propia del front C#: mismo sistema de diseño que Python y PHP,
+   con un acento naranja para distinguirlo a simple vista de los otros dos. */
 :root{
-  --bg:#F2F2F7;
+  --bg:#FBF4EE;
   --surface:#FFFFFF;
-  --surface-2:#F7F7FB;
-  --ink:#20212E;
-  --ink-muted:#5C5F72;
-  --line:#D8D9E4;
-  --line-strong:#BCBECF;
-  --accent:#4C56A6;
-  --accent-soft:#E7E8F6;
-  --accent-ink:#2B3170;
+  --surface-2:#FDF6F0;
+  --ink:#2B211B;
+  --ink-muted:#6E5C4E;
+  --line:#E9D9C8;
+  --line-strong:#D6BFA6;
+  --accent:#EA580C;
+  --accent-soft:#FDEAD9;
+  --accent-ink:#9A3412;
   --warn:#B5651D;
   --warn-soft:#F7E9DA;
   --danger:#A13F3F;
   --danger-soft:#F5E4E2;
-  --sidebar-bg:#191B2B;
-  --sidebar-bg-2:#212440;
-  --sidebar-ink:#AEB0C9;
+  --sidebar-bg:#241A12;
+  --sidebar-bg-2:#2E2116;
+  --sidebar-ink:#C9B29B;
   --sidebar-ink-active:#FFFFFF;
-  --sidebar-line:#2C2F4A;
-  --sidebar-accent:#9AA3F0;
+  --sidebar-line:#4A3626;
+  --sidebar-accent:#FDBA74;
   --font-display: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
   --font-body: -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#100F16;
-    --surface:#17161F;
-    --surface-2:#1D1C28;
-    --ink:#E9E9F0;
-    --ink-muted:#9C9DB0;
-    --line:#2C2B3A;
-    --line-strong:#3B3A4D;
-    --accent:#9AA3F0;
-    --accent-soft:#242850;
-    --accent-ink:#D3D6FA;
+    --bg:#1A130D;
+    --surface:#211810;
+    --surface-2:#271D14;
+    --ink:#F3E9DF;
+    --ink-muted:#BCA38C;
+    --line:#3D2E20;
+    --line-strong:#4F3B29;
+    --accent:#FDBA74;
+    --accent-soft:#3A2413;
+    --accent-ink:#FED7AA;
     --warn:#D98A4A;
     --warn-soft:#2E2115;
     --danger:#D97575;
     --danger-soft:#2E1E1D;
-    --sidebar-bg:#0D0C13;
-    --sidebar-bg-2:#151420;
-    --sidebar-ink:#8E8FA6;
+    --sidebar-bg:#120C08;
+    --sidebar-bg-2:#1C130D;
+    --sidebar-ink:#A88F76;
     --sidebar-ink-active:#FFFFFF;
-    --sidebar-line:#201F2E;
-    --sidebar-accent:#9AA3F0;
+    --sidebar-line:#2E2116;
+    --sidebar-accent:#FDBA74;
   }
 }
 
@@ -174,7 +173,7 @@ form{display:flex; flex-direction:column; gap:0.85rem;}
   padding:0.65rem 1.05rem; border-radius:6px; cursor:pointer; width:fit-content;
 }
 .btn-primary{background:var(--accent); color:#fff;}
-.btn-primary:hover{filter:brightness(1.05);}
+.btn-primary:hover{filter:brightness(1.08);}
 .btn-danger{background:var(--danger); color:#fff;}
 .btn-danger:hover{filter:brightness(1.08);}
 .btn:focus-visible{outline:2px solid var(--ink); outline-offset:2px;}

@@ -52,6 +52,15 @@
         </a>
       </div>
 
+      <div class="nav-label">Mejora adicional</div>
+      <div class="nav">
+        <a class="nav-item {{ 'active' if vista == 'locales' }}" href="{{ url_for('index', view='locales') }}">
+          <span class="num">07</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          Locales y stock
+        </a>
+      </div>
+
       <div class="sidebar-footer">
         <span class="instancia-pill"><span class="status-dot"></span>Servidor: {{ instancia }}</span>
         <div class="team">
@@ -98,6 +107,18 @@
               <div class="field"><label for="r-precio">Precio</label><input id="r-precio" name="precio" type="number" step="0.01" min="0.01" placeholder="189.90" required></div>
             </div>
             <div class="field"><label for="r-cantidad">Cantidad</label><input id="r-cantidad" name="cantidad" type="number" min="0" placeholder="10" required></div>
+
+            <div class="field" style="border-top:1px solid var(--border); margin-top:0.9rem; padding-top:0.9rem;">
+              <label for="r-tienda">Tienda inicial (opcional) <span class="tag" style="margin-left:0.4rem;">mejora adicional</span></label>
+              <select id="r-tienda" name="tienda_id">
+                <option value="">— Sin asignar —</option>
+                {% for local in locales %}
+                  <option value="{{ local.id }}">{{ local.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="field"><label for="r-cantidad-tienda">Cantidad en esa tienda</label><input id="r-cantidad-tienda" name="cantidad_tienda" type="number" min="0" placeholder="10"></div>
+
             <button class="btn btn-primary" type="submit">Registrar producto</button>
           </form>
         </div>
@@ -138,6 +159,45 @@
             {% endif %}
           </div>
         </div>
+
+        {% if resultado_consulta %}
+        <div class="grid-2" style="margin-top:1.25rem;">
+          <div class="card">
+            <h3>Stock por local <span class="tag">mejora adicional</span></h3>
+            <div id="mapa-stock" style="height:260px; border-radius:6px; overflow:hidden; margin-bottom:0.9rem;"></div>
+            {% if stock_por_local %}
+              <div class="kv">
+                {% for fila in stock_por_local %}
+                  <div class="kv-row"><span class="k">{{ fila.nombre }}</span><span class="v">{{ "%04d"|format(fila.cantidad|int) }}</span></div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="vacio-nota">Este producto todavía no tiene stock asignado a ningún local.</p>
+            {% endif %}
+          </div>
+
+          <div class="card">
+            <h3>Asignar / actualizar stock en un local <span class="tag">entrada</span></h3>
+            {% if locales %}
+              <form method="post" action="{{ url_for('asignar_stock_local') }}">
+                <input type="hidden" name="codigo" value="{{ resultado_consulta.codigo }}">
+                <div class="field">
+                  <label for="sl-local">Local</label>
+                  <select id="sl-local" name="localId" required>
+                    {% for local in locales %}
+                      <option value="{{ local.id }}">{{ local.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="field"><label for="sl-cantidad">Cantidad en ese local</label><input id="sl-cantidad" name="cantidad" type="number" min="0" placeholder="15" required></div>
+                <button class="btn btn-primary" type="submit">Guardar</button>
+              </form>
+            {% else %}
+              <p class="vacio-nota">Todavía no hay locales creados — ve a "Locales y stock" para crear el primero.</p>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
       </section>
 
       <!-- ============ 03 LISTAR ============ -->
@@ -157,9 +217,18 @@
           <div class="kpi"><div class="label">Bajo stock (&lt; {{ umbral_bajo_stock }})</div><div class="value {{ 'warn' if bajo_stock > 0 }}">{{ bajo_stock }}</div></div>
         </div>
 
+        <div class="card" style="margin-bottom:1.25rem;">
+          <h3>Mapa de tiendas <span class="tag">mejora adicional</span></h3>
+          {% if mapa_locales %}
+            <div id="mapa-listar" style="height:220px; border-radius:6px; overflow:hidden;"></div>
+          {% else %}
+            <p class="vacio-nota">Todavía no hay tiendas creadas — ve a "Locales y stock" para crear la primera.</p>
+          {% endif %}
+        </div>
+
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th>Origen</th><th></th></tr></thead>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th>Origen</th><th>Tiendas</th><th></th></tr></thead>
             <tbody>
               {% for p in productos %}
               <tr>
@@ -169,6 +238,14 @@
                 <td class="num">${{ "%.2f"|format(p.precio) }}</td>
                 <td class="num"><span class="stock-chip {{ 'stock-low' if p.cantidad < umbral_bajo_stock else 'stock-ok' }}">{{ "%04d"|format(p.cantidad) }}</span></td>
                 <td><span class="origen-chip">{{ origenes.get(p.codigo, "—") }}</span></td>
+                <td>
+                  {% set r = resumen_tiendas.get(p.codigo) %}
+                  {% if r %}
+                    <span class="origen-chip">{{ r.tiendas }} tienda(s) · {{ r.total }} u.</span>
+                  {% else %}
+                    <span class="vacio-nota" style="margin:0;">sin asignar</span>
+                  {% endif %}
+                </td>
                 <td>
                   <div class="row-actions">
                     <a class="icon-btn" href="{{ url_for('index', view='consultar', codigo=p.codigo) }}">Consultar</a>
@@ -184,7 +261,7 @@
                 </td>
               </tr>
               {% else %}
-              <tr><td colspan="7" class="vacio">No hay productos registrados todavía.</td></tr>
+              <tr><td colspan="8" class="vacio">No hay productos registrados todavía.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -202,14 +279,38 @@
           <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
         </div>
 
-        <div class="card" style="max-width:26rem;">
-          <h3>Nueva cantidad <span class="tag">entrada</span></h3>
-          <form method="post" action="{{ url_for('actualizar_stock') }}">
-            <input type="hidden" name="next" value="stock">
-            <div class="field"><label for="s-codigo">Código</label><input id="s-codigo" name="codigo" value="{{ codigo_prefill }}" placeholder="P101" required></div>
-            <div class="field"><label for="s-cantidad">Nueva cantidad</label><input id="s-cantidad" name="cantidad" type="number" min="0" placeholder="20" required></div>
-            <button class="btn btn-primary" type="submit">Actualizar stock</button>
-          </form>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Nueva cantidad (global) <span class="tag">entrada</span></h3>
+            <form method="post" action="{{ url_for('actualizar_stock') }}">
+              <input type="hidden" name="next" value="stock">
+              <div class="field"><label for="s-codigo">Código</label><input id="s-codigo" name="codigo" value="{{ codigo_prefill }}" placeholder="P101" required></div>
+              <div class="field"><label for="s-cantidad">Nueva cantidad</label><input id="s-cantidad" name="cantidad" type="number" min="0" placeholder="20" required></div>
+              <button class="btn btn-primary" type="submit">Actualizar stock</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>Actualizar stock en una tienda <span class="tag">mejora adicional</span></h3>
+            {% if locales %}
+              <form method="post" action="{{ url_for('asignar_stock_local') }}">
+                <input type="hidden" name="next" value="stock">
+                <div class="field"><label for="st-codigo">Código</label><input id="st-codigo" name="codigo" value="{{ codigo_prefill }}" placeholder="P101" required></div>
+                <div class="field">
+                  <label for="st-local">Tienda</label>
+                  <select id="st-local" name="localId" required>
+                    {% for local in locales %}
+                      <option value="{{ local.id }}">{{ local.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="field"><label for="st-cantidad">Cantidad en esa tienda</label><input id="st-cantidad" name="cantidad" type="number" min="0" placeholder="15" required></div>
+                <button class="btn btn-primary" type="submit">Guardar</button>
+              </form>
+            {% else %}
+              <p class="vacio-nota">Todavía no hay tiendas creadas — ve a "Locales y stock" para crear la primera.</p>
+            {% endif %}
+          </div>
         </div>
       </section>
 
@@ -246,6 +347,49 @@
             {% endif %}
           </div>
         </div>
+
+        <div class="grid-2" style="margin-top:1.25rem;">
+          <div class="card">
+            <h3>Valor por tienda <span class="tag">mejora adicional</span></h3>
+            {% if locales %}
+              <form method="get" action="{{ url_for('index') }}">
+                <input type="hidden" name="view" value="valor">
+                <div class="field">
+                  <label for="vl-local">Tienda</label>
+                  <select id="vl-local" name="localId" required>
+                    {% for local in locales %}
+                      <option value="{{ local.id }}">{{ local.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <button class="btn btn-primary" type="submit">Calcular</button>
+              </form>
+            {% else %}
+              <p class="vacio-nota">Todavía no hay tiendas creadas.</p>
+            {% endif %}
+          </div>
+
+          <div class="card">
+            <h3>Resultado por tienda <span class="tag">salida</span></h3>
+            {% if resultado_valor_local and resultado_valor_local.estado %}
+              <div class="stat-tile">
+                <span class="label">Valor total en {{ resultado_valor_local.localNombre }}</span>
+                <span class="amount">${{ "%.2f"|format(resultado_valor_local.valorTotal) }}</span>
+              </div>
+              {% if resultado_valor_local.productos %}
+                <div class="kv" style="margin-top:0.9rem;">
+                  {% for p in resultado_valor_local.productos %}
+                    <div class="kv-row"><span class="k">{{ p.nombre }}</span><span class="v">{{ p.cantidad }} u. · ${{ "%.2f"|format(p.precio) }}</span></div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <p class="vacio-nota">Esta tienda todavía no tiene productos con stock asignado.</p>
+              {% endif %}
+            {% else %}
+              <p class="vacio-nota">Todavía no has calculado el valor de ninguna tienda en esta sesión.</p>
+            {% endif %}
+          </div>
+        </div>
       </section>
 
       <!-- ============ 06 ELIMINAR ============ -->
@@ -267,13 +411,137 @@
             <div class="field"><label for="e-codigo">Código</label><input id="e-codigo" name="codigo" placeholder="P200" required></div>
             <div class="danger-box">
               <h4>Esta acción no se puede deshacer</h4>
-              <p>El producto se borra de la memoria del servidor y, si Supabase está conectado, también de la tabla persistida.</p>
+              <p>El producto se borra de la memoria del servidor y, si Supabase está conectado, también de la tabla persistida (incluyendo su stock en todas las tiendas).</p>
             </div>
             <button class="btn btn-danger" type="submit">Eliminar producto</button>
           </form>
         </div>
       </section>
+
+      <!-- ============ 07 LOCALES (mejora adicional) ============ -->
+      <section class="view {{ 'active' if vista == 'locales' }}">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Mejora adicional · LocalesService (WSDL)</span>
+            <h1 class="page-title">Locales y stock por sucursal</h1>
+            <p class="page-desc">Crea locales con su ubicación geográfica; luego, desde "Consultar producto", asigna cuánto stock de cada producto hay en cada local.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl (LocalesService)</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3>{{ 'Editar local' if local_editar else 'Nuevo local' }} <span class="tag">entrada</span></h3>
+            {% if local_editar %}
+              <form method="post" action="{{ url_for('editar_local') }}">
+                <input type="hidden" name="id" value="{{ local_editar.id }}">
+                <div class="field"><label for="l-nombre">Nombre</label><input id="l-nombre" name="nombre" value="{{ local_editar.nombre }}" required></div>
+                <div class="field-row">
+                  <div class="field"><label for="l-lat">Latitud</label><input id="l-lat" name="lat" type="number" step="0.0001" value="{{ local_editar.lat }}" required></div>
+                  <div class="field"><label for="l-lng">Longitud</label><input id="l-lng" name="lng" type="number" step="0.0001" value="{{ local_editar.lng }}" required></div>
+                </div>
+                <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                <a class="icon-btn" href="{{ url_for('index', view='locales') }}" style="margin-left:0.6rem;">Cancelar</a>
+              </form>
+            {% else %}
+              <form method="post" action="{{ url_for('crear_local') }}">
+                <div class="field"><label for="l-nombre">Nombre</label><input id="l-nombre" name="nombre" placeholder="Local Manta" required></div>
+                <div class="field-row">
+                  <div class="field"><label for="l-lat">Latitud</label><input id="l-lat" name="lat" type="number" step="0.0001" placeholder="-0.9500" required></div>
+                  <div class="field"><label for="l-lng">Longitud</label><input id="l-lng" name="lng" type="number" step="0.0001" placeholder="-80.7300" required></div>
+                </div>
+                <button class="btn btn-primary" type="submit">Crear local</button>
+              </form>
+            {% endif %}
+          </div>
+
+          <div class="card">
+            <h3>Locales registrados <span class="tag">salida</span></h3>
+            {% if locales %}
+              <div class="kv">
+                {% for local in locales %}
+                  <div class="kv-row">
+                    <span class="k">{{ local.nombre }}</span>
+                    <span class="v">{{ "%.4f"|format(local.lat) }}, {{ "%.4f"|format(local.lng) }}</span>
+                    <div class="row-actions" style="margin-left:0.6rem;">
+                      <a class="icon-btn" href="{{ url_for('index', view='locales', editar=local.id) }}">Editar</a>
+                      <form method="post" action="{{ url_for('eliminar_local') }}" class="inline-form"
+                            onsubmit="return confirm('¿Eliminar {{ local.nombre }}? También se borra su stock asociado.');">
+                        <input type="hidden" name="id" value="{{ local.id }}">
+                        <button class="icon-btn icon-btn-danger" type="submit">Eliminar</button>
+                      </form>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="vacio-nota">Todavía no hay locales creados.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.25rem;">
+          <h3>Mapa de tiendas <span class="tag">productos y stock</span></h3>
+          {% if mapa_locales %}
+            <div id="mapa-locales-central" style="height:360px; border-radius:6px; overflow:hidden;"></div>
+          {% else %}
+            <p class="vacio-nota">Todavía no hay tiendas creadas.</p>
+          {% endif %}
+        </div>
+      </section>
     </main>
   </div>
+
+  {% if resultado_consulta or mapa_locales %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Dibuja un mapa Leaflet con un marcador por tienda; cada popup puede
+    // mostrar solo la cantidad (mapa por producto, en Consultar) o la lista
+    // completa de productos + valor (mapa de tiendas, en Listar/Locales).
+    function renderizarMapaTiendas(idContenedor, tiendas, popupHtml) {
+      const contenedor = document.getElementById(idContenedor);
+      if (!contenedor || !tiendas.length) return;
+      const mapa = L.map(contenedor).setView([-1.5, -78.9], 6.2);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(mapa);
+      const puntos = [];
+      tiendas.forEach(function (tienda) {
+        const punto = [tienda.lat, tienda.lng];
+        puntos.push(punto);
+        L.marker(punto).addTo(mapa).bindPopup(popupHtml(tienda));
+      });
+      if (puntos.length > 1) {
+        mapa.fitBounds(puntos, { padding: [24, 24] });
+      } else {
+        mapa.setView(puntos[0], 12);
+      }
+    }
+
+    {% if resultado_consulta %}
+    renderizarMapaTiendas(
+      'mapa-stock',
+      {{ stock_por_local | tojson }},
+      function (fila) { return '<b>' + fila.nombre + '</b><br>' + fila.cantidad + ' unidades'; }
+    );
+    {% endif %}
+
+    {% if mapa_locales %}
+    function popupTienda(tienda) {
+      const lista = tienda.productos.length
+        ? tienda.productos.map(function (p) { return p.nombre + ' — ' + p.cantidad + ' u.'; }).join('<br>')
+        : 'Sin stock asignado';
+      return '<b>' + tienda.nombre + '</b><br>' + lista + '<br><b>Valor: $' + tienda.valorTotal.toFixed(2) + '</b>';
+    }
+    {% if vista == 'listar' %}
+    renderizarMapaTiendas('mapa-listar', {{ mapa_locales | tojson }}, popupTienda);
+    {% elif vista == 'locales' %}
+    renderizarMapaTiendas('mapa-locales-central', {{ mapa_locales | tojson }}, popupTienda);
+    {% endif %}
+    {% endif %}
+  </script>
+  {% endif %}
 </body>
 </html>

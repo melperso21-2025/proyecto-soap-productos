@@ -5,9 +5,15 @@
  *
  * Espejo funcional del dashboard de Python (cliente-python/app.py): mismas
  * 6 vistas, mismo menu lateral, misma paleta. Usa SoapClient nativo para
- * hablar con el servicio (igual que cliente-php/client.php) y consume la
- * API REST del servidor (GET /api/equipo) para mostrar al equipo - asi
- * demuestra los dos protocolos que expone el mismo backend.
+ * hablar con el servicio (igual que cliente-php/client.php).
+ *
+ * El WSDL declara DOS servicios: ProductosService (las 6 operaciones
+ * calificadas, sin cambios) y LocalesService (mejora adicional de
+ * locales/mapa/stock por tienda) -- ambos por SOAP real. A diferencia de
+ * zeep (Python), SoapClient de PHP fusiona las operaciones de ambos
+ * servicios en un solo cliente y enruta automaticamente cada llamada a la
+ * direccion correcta segun lo que declara el WSDL -- no hace falta un
+ * cliente separado por servicio.
  *
  * Se corre con el servidor embebido de PHP, en un puerto distinto al de
  * Python para que ambos convivan al mismo tiempo:
@@ -20,7 +26,7 @@ const WSDL_URL = "http://localhost:8000/productos?wsdl";
 const API_EQUIPO_URL = "http://localhost:8000/api/equipo";
 const API_INSTANCIA_URL = "http://localhost:8000/api/instancia";
 const API_PRODUCTOS_URL = "http://localhost:8000/api/productos";
-const VISTAS = ["registrar", "consultar", "listar", "stock", "valor", "eliminar"];
+const VISTAS = ["registrar", "consultar", "listar", "stock", "valor", "eliminar", "locales"];
 const UMBRAL_BAJO_STOCK = 5;
 
 function e($valor): string {
@@ -33,6 +39,38 @@ function obtenerCliente(): SoapClient {
         "exceptions" => true,
         "connection_timeout" => 5,
     ]);
+}
+
+// SOAP no distingue "un elemento" de "una lista de un elemento": cuando un
+// campo repetible (locales, productos, stockPorLocal) tiene un solo valor,
+// SoapClient lo entrega como un unico stdClass en vez de un array de uno.
+// Esta funcion convierte recursivamente stdClass -> array asociativo,
+// envuelve esos campos conocidos en una lista si hiciera falta, y castea a
+// float los xsd:decimal -- SoapClient los devuelve como string por
+// defecto (para no perder precision), lo cual rompe operaciones JS como
+// "valorTotal.toFixed()" si se serializan tal cual con json_encode.
+function normalizarSoap($valor) {
+    if (is_object($valor)) {
+        $valor = get_object_vars($valor);
+    }
+    if (!is_array($valor)) {
+        return $valor;
+    }
+    $camposLista = ["locales", "productos", "stockPorLocal"];
+    $camposDecimal = ["lat", "lng", "precio", "valorTotal"];
+    $normalizado = [];
+    foreach ($valor as $clave => $v) {
+        $v = normalizarSoap($v);
+        if (in_array($clave, $camposLista, true) && $v !== null) {
+            if (!is_array($v) || !array_is_list($v)) {
+                $v = [$v];
+            }
+        } elseif (in_array($clave, $camposDecimal, true) && is_string($v) && is_numeric($v)) {
+            $v = (float) $v;
+        }
+        $normalizado[$clave] = $v;
+    }
+    return $normalizado;
 }
 
 function flash(string $mensaje, string $categoria): void {
@@ -82,6 +120,77 @@ function obtenerOrigenes(): array {
     return $mapa;
 }
 
+function obtenerLocales(): array {
+    // Mejora adicional por SOAP (LocalesService), portType separado del
+    // contrato calificado -- ver productos.wsdl.
+    try {
+        $r = obtenerCliente()->ListarLocales([]);
+        return normalizarSoap($r)["locales"] ?? [];
+    } catch (SoapFault $error) {
+        return [];
+    }
+}
+
+function obtenerStockPorLocal(string $codigo): array {
+    try {
+        $r = obtenerCliente()->ConsultarStockPorLocal(["codigo" => $codigo]);
+        if (!$r->estado) {
+            return [];
+        }
+        return normalizarSoap($r)["stockPorLocal"] ?? [];
+    } catch (SoapFault $error) {
+        return [];
+    }
+}
+
+function obtenerMapaLocales(): array {
+    // Todas las tiendas con sus productos y valor de inventario, en una
+    // sola llamada SOAP. Alimenta el mapa central de "Locales y stock" y
+    // el mini-mapa de "Listar productos".
+    try {
+        $r = obtenerCliente()->ObtenerMapaLocales([]);
+        $lista = normalizarSoap($r)["locales"] ?? [];
+        // Si un local no tiene ningun producto, el elemento repetible
+        // "productos" (minOccurs=0) no llega en absoluto en el XML -- ni
+        // siquiera como null -- asi que hay que ponerle un array vacio
+        // explicito para que el mapa (JS) no truene con "undefined".
+        foreach ($lista as &$local) {
+            $local["productos"] = $local["productos"] ?? [];
+        }
+        unset($local);
+        return $lista;
+    } catch (SoapFault $error) {
+        return [];
+    }
+}
+
+function resumenTiendasPorProducto(array $mapaLocales): array {
+    $resumen = [];
+    foreach ($mapaLocales as $local) {
+        foreach (($local["productos"] ?? []) as $producto) {
+            if (!isset($resumen[$producto["codigo"]])) {
+                $resumen[$producto["codigo"]] = ["tiendas" => 0, "total" => 0];
+            }
+            $resumen[$producto["codigo"]]["tiendas"]++;
+            $resumen[$producto["codigo"]]["total"] += $producto["cantidad"];
+        }
+    }
+    return $resumen;
+}
+
+function obtenerValorLocal($localId) {
+    // Valor de inventario de una tienda especifica (precio x stock_local),
+    // por SOAP. Extiende CalcularValorInventario (global) sin tocarla.
+    try {
+        $r = obtenerCliente()->CalcularValorPorLocal(["localId" => (int) $localId]);
+        $resultado = normalizarSoap($r);
+        $resultado["productos"] = $resultado["productos"] ?? [];
+        return $resultado;
+    } catch (SoapFault $error) {
+        return null;
+    }
+}
+
 // ============================================================
 // Acciones que escriben (POST) o ejecutan una consulta directa
 // ============================================================
@@ -89,16 +198,34 @@ $metodo = $_SERVER["REQUEST_METHOD"];
 $accion = $_GET["accion"] ?? null;
 
 if ($metodo === "POST" && $accion === "registrar") {
+    $codigo = $_POST["codigo"];
     try {
         $cliente = obtenerCliente();
         $r = $cliente->RegistrarProducto([
-            "codigo" => $_POST["codigo"],
+            "codigo" => $codigo,
             "nombre" => $_POST["nombre"],
             "categoria" => $_POST["categoria"],
             "precio" => (float) $_POST["precio"],
             "cantidad" => (int) $_POST["cantidad"],
         ]);
         flash($r->mensaje, $r->estado ? "ok" : "error");
+
+        // Tienda inicial (opcional, mejora adicional): segundo paso por
+        // SOAP (LocalesService) solo si el usuario eligio una tienda.
+        $tiendaId = $_POST["tienda_id"] ?? "";
+        $cantidadTienda = $_POST["cantidad_tienda"] ?? "";
+        if ($r->estado && $tiendaId !== "" && $cantidadTienda !== "") {
+            try {
+                $rTienda = $cliente->AsignarStockLocal([
+                    "codigo" => $codigo,
+                    "localId" => (int) $tiendaId,
+                    "cantidad" => (int) $cantidadTienda,
+                ]);
+                flash("Tienda inicial: " . $rTienda->mensaje, $rTienda->estado ? "ok" : "error");
+            } catch (SoapFault $error) {
+                flash("No se pudo asignar la tienda inicial: " . $error->getMessage(), "error");
+            }
+        }
     } catch (SoapFault $error) {
         flash("Error al registrar: " . $error->getMessage(), "error");
     }
@@ -176,6 +303,83 @@ if ($metodo === "POST" && $accion === "eliminar") {
     irA($siguiente);
 }
 
+if ($metodo === "POST" && $accion === "locales") {
+    try {
+        $r = obtenerCliente()->CrearLocal([
+            "nombre" => $_POST["nombre"],
+            "lat" => (float) $_POST["lat"],
+            "lng" => (float) $_POST["lng"],
+        ]);
+        flash($r->mensaje, $r->estado ? "ok" : "error");
+    } catch (SoapFault $error) {
+        flash("Error al crear el local: " . $error->getMessage(), "error");
+    }
+    irA("locales");
+}
+
+if ($metodo === "POST" && $accion === "locales-editar") {
+    try {
+        $r = obtenerCliente()->ActualizarLocal([
+            "id" => (int) $_POST["id"],
+            "nombre" => $_POST["nombre"],
+            "lat" => (float) $_POST["lat"],
+            "lng" => (float) $_POST["lng"],
+        ]);
+        flash($r->mensaje, $r->estado ? "ok" : "error");
+    } catch (SoapFault $error) {
+        flash("Error al editar el local: " . $error->getMessage(), "error");
+    }
+    irA("locales");
+}
+
+if ($metodo === "POST" && $accion === "locales-eliminar") {
+    try {
+        $r = obtenerCliente()->EliminarLocal(["id" => (int) $_POST["id"]]);
+        flash($r->mensaje, $r->estado ? "ok" : "error");
+    } catch (SoapFault $error) {
+        flash("Error al eliminar el local: " . $error->getMessage(), "error");
+    }
+    irA("locales");
+}
+
+if ($metodo === "POST" && $accion === "stock-local") {
+    $codigo = $_POST["codigo"];
+    $siguiente = $_POST["next"] ?? "consultar";
+    try {
+        $r = obtenerCliente()->AsignarStockLocal([
+            "codigo" => $codigo,
+            "localId" => (int) $_POST["localId"],
+            "cantidad" => (int) $_POST["cantidad"],
+        ]);
+        flash($r->mensaje, $r->estado ? "ok" : "error");
+    } catch (SoapFault $error) {
+        flash("Error al asignar el stock: " . $error->getMessage(), "error");
+    }
+
+    if ($siguiente !== "consultar") {
+        irA($siguiente, ["codigo" => $codigo]);
+    }
+
+    // Volvemos a consultar por SOAP para que la ficha no quede incompleta.
+    try {
+        $cliente = obtenerCliente();
+        $r = $cliente->ConsultarProducto(["codigo" => $codigo]);
+        if ($r->estado) {
+            irA("consultar", [
+                "codigo" => $r->codigo,
+                "nombre" => $r->nombre,
+                "categoria" => $r->categoria,
+                "precio" => $r->precio,
+                "cantidad" => $r->cantidad,
+                "encontrado" => "1",
+            ]);
+        }
+    } catch (SoapFault $error) {
+        // sigue abajo con el fallback
+    }
+    irA("consultar", ["codigo" => $codigo]);
+}
+
 // ============================================================
 // GET normal: preparar datos y renderizar la vista activa
 // ============================================================
@@ -210,6 +414,7 @@ foreach ($productos as $p) {
 }
 
 $resultadoConsulta = null;
+$stockPorLocal = [];
 if ($vista === "consultar" && isset($_GET["encontrado"])) {
     $resultadoConsulta = [
         "codigo" => $_GET["codigo"] ?? "",
@@ -218,6 +423,7 @@ if ($vista === "consultar" && isset($_GET["encontrado"])) {
         "precio" => $_GET["precio"] ?? "",
         "cantidad" => $_GET["cantidad"] ?? "",
     ];
+    $stockPorLocal = obtenerStockPorLocal($resultadoConsulta["codigo"]);
 }
 
 $resultadoValor = null;
@@ -231,9 +437,28 @@ if ($vista === "valor" && isset($_GET["valorTotal"])) {
     ];
 }
 
+$resultadoValorLocal = null;
+if ($vista === "valor" && isset($_GET["localId"])) {
+    $resultadoValorLocal = obtenerValorLocal($_GET["localId"]);
+}
+
 $equipo = obtenerEquipo();
 $instancia = obtenerInstancia();
 $origenes = obtenerOrigenes();
+$locales = obtenerLocales();
+
+$localEditar = null;
+if ($vista === "locales" && isset($_GET["editar"])) {
+    foreach ($locales as $local) {
+        if ((string) $local["id"] === (string) $_GET["editar"]) {
+            $localEditar = $local;
+            break;
+        }
+    }
+}
+
+$mapaLocales = in_array($vista, ["listar", "locales"], true) ? obtenerMapaLocales() : [];
+$resumenTiendas = resumenTiendasPorProducto($mapaLocales);
 
 $mensajes = $_SESSION["flash"] ?? [];
 unset($_SESSION["flash"]);
@@ -292,6 +517,15 @@ unset($_SESSION["flash"]);
         </a>
       </div>
 
+      <div class="nav-label">Mejora adicional</div>
+      <div class="nav">
+        <a class="nav-item <?= $vista === "locales" ? "active" : "" ?>" href="index.php?view=locales">
+          <span class="num">07</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 0 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          Locales y stock
+        </a>
+      </div>
+
       <div class="sidebar-footer">
         <span class="instancia-pill"><span class="status-dot"></span>Servidor: <?= e($instancia) ?></span>
         <div class="team">
@@ -334,6 +568,18 @@ unset($_SESSION["flash"]);
               <div class="field"><label for="r-precio">Precio</label><input id="r-precio" name="precio" type="number" step="0.01" min="0.01" placeholder="189.90" required></div>
             </div>
             <div class="field"><label for="r-cantidad">Cantidad</label><input id="r-cantidad" name="cantidad" type="number" min="0" placeholder="10" required></div>
+
+            <div class="field" style="border-top:1px solid var(--border); margin-top:0.9rem; padding-top:0.9rem;">
+              <label for="r-tienda">Tienda inicial (opcional) <span class="tag" style="margin-left:0.4rem;">mejora adicional</span></label>
+              <select id="r-tienda" name="tienda_id">
+                <option value="">— Sin asignar —</option>
+                <?php foreach ($locales as $local): ?>
+                  <option value="<?= e($local["id"]) ?>"><?= e($local["nombre"]) ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="field"><label for="r-cantidad-tienda">Cantidad en esa tienda</label><input id="r-cantidad-tienda" name="cantidad_tienda" type="number" min="0" placeholder="10"></div>
+
             <button class="btn btn-primary" type="submit">Registrar producto</button>
           </form>
         </div>
@@ -374,6 +620,45 @@ unset($_SESSION["flash"]);
             <?php endif; ?>
           </div>
         </div>
+
+        <?php if ($resultadoConsulta): ?>
+        <div class="grid-2" style="margin-top:1.25rem;">
+          <div class="card">
+            <h3>Stock por local <span class="tag">mejora adicional</span></h3>
+            <div id="mapa-stock" style="height:260px; border-radius:6px; overflow:hidden; margin-bottom:0.9rem;"></div>
+            <?php if ($stockPorLocal): ?>
+              <div class="kv">
+                <?php foreach ($stockPorLocal as $fila): ?>
+                  <div class="kv-row"><span class="k"><?= e($fila["nombre"]) ?></span><span class="v"><?= e(str_pad((string) (int) $fila["cantidad"], 4, "0", STR_PAD_LEFT)) ?></span></div>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <p class="vacio-nota">Este producto todavía no tiene stock asignado a ningún local.</p>
+            <?php endif; ?>
+          </div>
+
+          <div class="card">
+            <h3>Asignar / actualizar stock en un local <span class="tag">entrada</span></h3>
+            <?php if ($locales): ?>
+              <form method="post" action="index.php?accion=stock-local">
+                <input type="hidden" name="codigo" value="<?= e($resultadoConsulta["codigo"]) ?>">
+                <div class="field">
+                  <label for="sl-local">Local</label>
+                  <select id="sl-local" name="localId" required>
+                    <?php foreach ($locales as $local): ?>
+                      <option value="<?= e($local["id"]) ?>"><?= e($local["nombre"]) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+                <div class="field"><label for="sl-cantidad">Cantidad en ese local</label><input id="sl-cantidad" name="cantidad" type="number" min="0" placeholder="15" required></div>
+                <button class="btn btn-primary" type="submit">Guardar</button>
+              </form>
+            <?php else: ?>
+              <p class="vacio-nota">Todavía no hay locales creados — ve a "Locales y stock" para crear el primero.</p>
+            <?php endif; ?>
+          </div>
+        </div>
+        <?php endif; ?>
       </section>
 
       <!-- ============ 03 LISTAR ============ -->
@@ -393,12 +678,21 @@ unset($_SESSION["flash"]);
           <div class="kpi"><div class="label">Bajo stock (&lt; <?= e(UMBRAL_BAJO_STOCK) ?>)</div><div class="value <?= $bajoStock > 0 ? "warn" : "" ?>"><?= e($bajoStock) ?></div></div>
         </div>
 
+        <div class="card" style="margin-bottom:1.25rem;">
+          <h3>Mapa de tiendas <span class="tag">mejora adicional</span></h3>
+          <?php if ($mapaLocales): ?>
+            <div id="mapa-listar" style="height:220px; border-radius:6px; overflow:hidden;"></div>
+          <?php else: ?>
+            <p class="vacio-nota">Todavía no hay tiendas creadas — ve a "Locales y stock" para crear la primera.</p>
+          <?php endif; ?>
+        </div>
+
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th>Origen</th><th></th></tr></thead>
+            <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th style="text-align:right;">Precio</th><th style="text-align:right;">Stock</th><th>Origen</th><th>Tiendas</th><th></th></tr></thead>
             <tbody>
               <?php if (!$productos): ?>
-                <tr><td colspan="7" class="vacio">No hay productos registrados todavía.</td></tr>
+                <tr><td colspan="8" class="vacio">No hay productos registrados todavía.</td></tr>
               <?php endif; ?>
               <?php foreach ($productos as $p): ?>
                 <tr>
@@ -408,6 +702,13 @@ unset($_SESSION["flash"]);
                   <td class="num">$<?= e(number_format($p->precio, 2)) ?></td>
                   <td class="num"><span class="stock-chip <?= $p->cantidad < UMBRAL_BAJO_STOCK ? "stock-low" : "stock-ok" ?>"><?= e(str_pad((string) $p->cantidad, 4, "0", STR_PAD_LEFT)) ?></span></td>
                   <td><span class="origen-chip"><?= e($origenes[$p->codigo] ?? "—") ?></span></td>
+                  <td>
+                    <?php if (isset($resumenTiendas[$p->codigo])): ?>
+                      <span class="origen-chip"><?= e($resumenTiendas[$p->codigo]["tiendas"]) ?> tienda(s) · <?= e($resumenTiendas[$p->codigo]["total"]) ?> u.</span>
+                    <?php else: ?>
+                      <span class="vacio-nota" style="margin:0;">sin asignar</span>
+                    <?php endif; ?>
+                  </td>
                   <td>
                     <div class="row-actions">
                       <a class="icon-btn" href="index.php?view=consultar&codigo=<?= urlencode($p->codigo) ?>">Consultar</a>
@@ -439,14 +740,38 @@ unset($_SESSION["flash"]);
           <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl</span>
         </div>
 
-        <div class="card" style="max-width:26rem;">
-          <h3>Nueva cantidad <span class="tag">entrada</span></h3>
-          <form method="post" action="index.php?accion=stock">
-            <input type="hidden" name="next" value="stock">
-            <div class="field"><label for="s-codigo">Código</label><input id="s-codigo" name="codigo" value="<?= e($codigoPrefill) ?>" placeholder="P101" required></div>
-            <div class="field"><label for="s-cantidad">Nueva cantidad</label><input id="s-cantidad" name="cantidad" type="number" min="0" placeholder="20" required></div>
-            <button class="btn btn-primary" type="submit">Actualizar stock</button>
-          </form>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Nueva cantidad (global) <span class="tag">entrada</span></h3>
+            <form method="post" action="index.php?accion=stock">
+              <input type="hidden" name="next" value="stock">
+              <div class="field"><label for="s-codigo">Código</label><input id="s-codigo" name="codigo" value="<?= e($codigoPrefill) ?>" placeholder="P101" required></div>
+              <div class="field"><label for="s-cantidad">Nueva cantidad</label><input id="s-cantidad" name="cantidad" type="number" min="0" placeholder="20" required></div>
+              <button class="btn btn-primary" type="submit">Actualizar stock</button>
+            </form>
+          </div>
+
+          <div class="card">
+            <h3>Actualizar stock en una tienda <span class="tag">mejora adicional</span></h3>
+            <?php if ($locales): ?>
+              <form method="post" action="index.php?accion=stock-local">
+                <input type="hidden" name="next" value="stock">
+                <div class="field"><label for="st-codigo">Código</label><input id="st-codigo" name="codigo" value="<?= e($codigoPrefill) ?>" placeholder="P101" required></div>
+                <div class="field">
+                  <label for="st-local">Tienda</label>
+                  <select id="st-local" name="localId" required>
+                    <?php foreach ($locales as $local): ?>
+                      <option value="<?= e($local["id"]) ?>"><?= e($local["nombre"]) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+                <div class="field"><label for="st-cantidad">Cantidad en esa tienda</label><input id="st-cantidad" name="cantidad" type="number" min="0" placeholder="15" required></div>
+                <button class="btn btn-primary" type="submit">Guardar</button>
+              </form>
+            <?php else: ?>
+              <p class="vacio-nota">Todavía no hay tiendas creadas — ve a "Locales y stock" para crear la primera.</p>
+            <?php endif; ?>
+          </div>
         </div>
       </section>
 
@@ -484,6 +809,49 @@ unset($_SESSION["flash"]);
             <?php endif; ?>
           </div>
         </div>
+
+        <div class="grid-2" style="margin-top:1.25rem;">
+          <div class="card">
+            <h3>Valor por tienda <span class="tag">mejora adicional</span></h3>
+            <?php if ($locales): ?>
+              <form method="get" action="index.php">
+                <input type="hidden" name="view" value="valor">
+                <div class="field">
+                  <label for="vl-local">Tienda</label>
+                  <select id="vl-local" name="localId" required>
+                    <?php foreach ($locales as $local): ?>
+                      <option value="<?= e($local["id"]) ?>"><?= e($local["nombre"]) ?></option>
+                    <?php endforeach; ?>
+                  </select>
+                </div>
+                <button class="btn btn-primary" type="submit">Calcular</button>
+              </form>
+            <?php else: ?>
+              <p class="vacio-nota">Todavía no hay tiendas creadas.</p>
+            <?php endif; ?>
+          </div>
+
+          <div class="card">
+            <h3>Resultado por tienda <span class="tag">salida</span></h3>
+            <?php if ($resultadoValorLocal && !empty($resultadoValorLocal["estado"])): ?>
+              <div class="stat-tile">
+                <span class="label">Valor total en <?= e($resultadoValorLocal["localNombre"]) ?></span>
+                <span class="amount">$<?= e(number_format((float) $resultadoValorLocal["valorTotal"], 2)) ?></span>
+              </div>
+              <?php if ($resultadoValorLocal["productos"]): ?>
+                <div class="kv" style="margin-top:0.9rem;">
+                  <?php foreach ($resultadoValorLocal["productos"] as $p): ?>
+                    <div class="kv-row"><span class="k"><?= e($p["nombre"]) ?></span><span class="v"><?= e($p["cantidad"]) ?> u. · $<?= e(number_format((float) $p["precio"], 2)) ?></span></div>
+                  <?php endforeach; ?>
+                </div>
+              <?php else: ?>
+                <p class="vacio-nota">Esta tienda todavía no tiene productos con stock asignado.</p>
+              <?php endif; ?>
+            <?php else: ?>
+              <p class="vacio-nota">Todavía no has calculado el valor de ninguna tienda en esta sesión.</p>
+            <?php endif; ?>
+          </div>
+        </div>
       </section>
 
       <!-- ============ 06 ELIMINAR ============ -->
@@ -505,13 +873,137 @@ unset($_SESSION["flash"]);
             <div class="field"><label for="e-codigo">Código</label><input id="e-codigo" name="codigo" placeholder="P200" required></div>
             <div class="danger-box">
               <h4>Esta acción no se puede deshacer</h4>
-              <p>El producto se borra de la memoria del servidor y, si Supabase está conectado, también de la tabla persistida.</p>
+              <p>El producto se borra de la memoria del servidor y, si Supabase está conectado, también de la tabla persistida (incluyendo su stock en todas las tiendas).</p>
             </div>
             <button class="btn btn-danger" type="submit">Eliminar producto</button>
           </form>
         </div>
       </section>
+
+      <!-- ============ 07 LOCALES (mejora adicional) ============ -->
+      <section class="view <?= $vista === "locales" ? "active" : "" ?>">
+        <div class="topline">
+          <div>
+            <span class="eyebrow">Mejora adicional · LocalesService (WSDL)</span>
+            <h1 class="page-title">Locales y stock por sucursal</h1>
+            <p class="page-desc">Crea locales con su ubicación geográfica; luego, desde "Consultar producto", asigna cuánto stock de cada producto hay en cada local.</p>
+          </div>
+          <span class="status-pill"><span class="status-dot"></span>conectado a /productos?wsdl (LocalesService)</span>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3><?= $localEditar ? "Editar local" : "Nuevo local" ?> <span class="tag">entrada</span></h3>
+            <?php if ($localEditar): ?>
+              <form method="post" action="index.php?accion=locales-editar">
+                <input type="hidden" name="id" value="<?= e($localEditar["id"]) ?>">
+                <div class="field"><label for="l-nombre">Nombre</label><input id="l-nombre" name="nombre" value="<?= e($localEditar["nombre"]) ?>" required></div>
+                <div class="field-row">
+                  <div class="field"><label for="l-lat">Latitud</label><input id="l-lat" name="lat" type="number" step="0.0001" value="<?= e($localEditar["lat"]) ?>" required></div>
+                  <div class="field"><label for="l-lng">Longitud</label><input id="l-lng" name="lng" type="number" step="0.0001" value="<?= e($localEditar["lng"]) ?>" required></div>
+                </div>
+                <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                <a class="icon-btn" href="index.php?view=locales" style="margin-left:0.6rem;">Cancelar</a>
+              </form>
+            <?php else: ?>
+              <form method="post" action="index.php?accion=locales">
+                <div class="field"><label for="l-nombre">Nombre</label><input id="l-nombre" name="nombre" placeholder="Local Manta" required></div>
+                <div class="field-row">
+                  <div class="field"><label for="l-lat">Latitud</label><input id="l-lat" name="lat" type="number" step="0.0001" placeholder="-0.9500" required></div>
+                  <div class="field"><label for="l-lng">Longitud</label><input id="l-lng" name="lng" type="number" step="0.0001" placeholder="-80.7300" required></div>
+                </div>
+                <button class="btn btn-primary" type="submit">Crear local</button>
+              </form>
+            <?php endif; ?>
+          </div>
+
+          <div class="card">
+            <h3>Locales registrados <span class="tag">salida</span></h3>
+            <?php if ($locales): ?>
+              <div class="kv">
+                <?php foreach ($locales as $local): ?>
+                  <div class="kv-row">
+                    <span class="k"><?= e($local["nombre"]) ?></span>
+                    <span class="v"><?= e(number_format((float) $local["lat"], 4)) ?>, <?= e(number_format((float) $local["lng"], 4)) ?></span>
+                    <div class="row-actions" style="margin-left:0.6rem;">
+                      <a class="icon-btn" href="index.php?view=locales&editar=<?= e($local["id"]) ?>">Editar</a>
+                      <form method="post" action="index.php?accion=locales-eliminar" class="inline-form"
+                            onsubmit="return confirm('¿Eliminar <?= e($local["nombre"]) ?>? También se borra su stock asociado.');">
+                        <input type="hidden" name="id" value="<?= e($local["id"]) ?>">
+                        <button class="icon-btn icon-btn-danger" type="submit">Eliminar</button>
+                      </form>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+            <?php else: ?>
+              <p class="vacio-nota">Todavía no hay locales creados.</p>
+            <?php endif; ?>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.25rem;">
+          <h3>Mapa de tiendas <span class="tag">productos y stock</span></h3>
+          <?php if ($mapaLocales): ?>
+            <div id="mapa-locales-central" style="height:360px; border-radius:6px; overflow:hidden;"></div>
+          <?php else: ?>
+            <p class="vacio-nota">Todavía no hay tiendas creadas.</p>
+          <?php endif; ?>
+        </div>
+      </section>
     </main>
   </div>
+
+  <?php if ($resultadoConsulta || $mapaLocales): ?>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    // Dibuja un mapa Leaflet con un marcador por tienda; cada popup puede
+    // mostrar solo la cantidad (mapa por producto, en Consultar) o la lista
+    // completa de productos + valor (mapa de tiendas, en Listar/Locales).
+    function renderizarMapaTiendas(idContenedor, tiendas, popupHtml) {
+      const contenedor = document.getElementById(idContenedor);
+      if (!contenedor || !tiendas.length) return;
+      const mapa = L.map(contenedor).setView([-1.5, -78.9], 6.2);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(mapa);
+      const puntos = [];
+      tiendas.forEach(function (tienda) {
+        const punto = [tienda.lat, tienda.lng];
+        puntos.push(punto);
+        L.marker(punto).addTo(mapa).bindPopup(popupHtml(tienda));
+      });
+      if (puntos.length > 1) {
+        mapa.fitBounds(puntos, { padding: [24, 24] });
+      } else {
+        mapa.setView(puntos[0], 12);
+      }
+    }
+
+    <?php if ($resultadoConsulta): ?>
+    renderizarMapaTiendas(
+      'mapa-stock',
+      <?= json_encode(array_values($stockPorLocal)) ?>,
+      function (fila) { return '<b>' + fila.nombre + '</b><br>' + fila.cantidad + ' unidades'; }
+    );
+    <?php endif; ?>
+
+    <?php if ($mapaLocales): ?>
+    function popupTienda(tienda) {
+      const lista = tienda.productos.length
+        ? tienda.productos.map(function (p) { return p.nombre + ' — ' + p.cantidad + ' u.'; }).join('<br>')
+        : 'Sin stock asignado';
+      return '<b>' + tienda.nombre + '</b><br>' + lista + '<br><b>Valor: $' + tienda.valorTotal.toFixed(2) + '</b>';
+    }
+    <?php if ($vista === "listar"): ?>
+    renderizarMapaTiendas('mapa-listar', <?= json_encode(array_values($mapaLocales)) ?>, popupTienda);
+    <?php elseif ($vista === "locales"): ?>
+    renderizarMapaTiendas('mapa-locales-central', <?= json_encode(array_values($mapaLocales)) ?>, popupTienda);
+    <?php endif; ?>
+    <?php endif; ?>
+  </script>
+  <?php endif; ?>
 </body>
 </html>
